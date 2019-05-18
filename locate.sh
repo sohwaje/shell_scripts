@@ -5,5 +5,5 @@
 #locatedb에서 패턴의 마지막을 의미하는 "$" 메타문자를 이용할 수 있다. 이렇게 하면 마지막이 언제나 find로 끝나는 경로가 출력된다.
 locatedb ="/var/locate.db"
 
-#[2] 구축된 locatedb에서
+#[2] 구축된 locatedb에서 파일 경로를 찾는다.
 exec grep -i "$@" $locatedb
