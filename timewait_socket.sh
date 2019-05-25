@@ -1,5 +1,5 @@
 #!/bin/sh
-time_wait_idle=200
+time_wait_idle=200  #TIME_WAIT 소켓 개수 임계치 설정
 
 time_wait=$(netstat -napo | grep -i 'TIME_WAIT' | wc -l)  # time_wait 개수 확인
 alert=$(echo "$time_wait < $time_wait_idle" | bc)         # time_wait 개수와 time_wait_idle 개수 비교
