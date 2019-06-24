@@ -4,8 +4,8 @@
 #[3] 필요 시 삭제하지 않고, 파일명을 기록하는 용도로 사용할 수 있다.
 TARGET_DIR="/home"
 
-# 삭제
+# delete
 find $TARGET_DIR -name "*.*" -mtime +364 -print | xargs rm -fv
 
-# 아카이브
+# archive
 #find $TARGET_DIR -name "*.*" -mtime +364 -print >> no_use_file.txt
