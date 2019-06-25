@@ -41,3 +41,11 @@ do
 echo $i
 echo `ethtool $i | egrep '(Speed|Duplex|Auto-negotiation|Link)'`
 done
+
+#[7]IP 리스트 확인
+echo -e "\e[32m[6]IP 리스트 확인\e[39m"
+#ifconfig -a | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' # 정규식을 통해 IP리스트만 확인할 수 있음.
+ifconfig | egrep "(^\\w|inet )"
+GATEWAY=$(route | grep default | awk '{print $2}')
+echo "GW : $GATEWAY"
+
