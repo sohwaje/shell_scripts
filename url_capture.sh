@@ -1,51 +1,32 @@
-#!/bin/sh
-#############################################################
-#리눅스 시스템의 하드웨어 정보를 간략하게 확인할 수 있는 스크립트#
-#############################################################
+#!/bin/bash
+echo -e "INPUT URL: \c "
+read URL  #JAVA INSTANCE PID
+DATE=`date "+%Y%m%d_%H%M%S"`
 
-#[1]커널 정보 확인
-echo -e "\e[32m[1]커널 정보\e[39m"
-uname -a
+#[1] URL의 index.html 다운로드
+wget -O html $URL > /dev/null 2>&1
 
-#[2]하드웨어 밴더 확인
-echo -e "\e[32m[2]하드웨어 BIOS, 밴더 정보 확인\e[39m"
-HW_VENDOR=$(dmidecode -t bios | egrep '(Vendor|Version|Release Date)')
-HW_VENDOR2=$(dmidecode -t system | egrep '(Manufacturer|Product Name)')
-echo $HW_VENDOR
-echo $HW_VENDOR2
+#[2] html 파일에서 url만 추출
+cat html | grep -Po 'http.*://[^"]+' | grep -Po 'http.*://[^[[:space:]]+' >> $DATE.tmp
 
-#[3]CPU 정보 확인
-echo -e "\e[32m[3]CPU 모델, 클럭 정보 확인\e[39m"
-CPU=$(cat /proc/cpuinfo | grep -i 'model name' | sort -u | awk -F ":" '{print $2}')
-echo $CPU
+#[3]
+#3-1 cat 명령어로 파일을 열어서 파이프 라인을 통해 awk 명령어로 출력 값을 넘긴다.
+#3-2 awk는 각 행 전체($0)의 문자열 길이를 계산하여 문자열과 함께 출력한다. => "length 문자열"" 형식오로 표시된다.
+#3-3 sor -n 각 라인의 필드를 비교하는 대상을 숫자로 한정함. 즉, 여기서는 문자열의 길이를 기준으로 정렬.
+#3-4 정렬된 필드에서 -d' ' -f2- 필드 앞 부분 부터 두 번째 공백 필드를 제외한 모든 부분을 잘라낸다.
+cat $DATE.tmp | awk '{print length, $0}' | sort -n | cut -d ' ' -f2- | tail > result.txt
 
-echo -e "\e[32m[3]CPU 개수, Core 개수 확인\e[39m"
-p=$(grep "physical id" /proc/cpuinfo | sort -u | wc -l)
-core=$(grep "cpu cores" /proc/cpuinfo | tail -1 | awk '{print $4}')
-echo "$p P,$core core"
-
-#[4]메모리 슬롯 정보 확인
-echo -e "\e[32m[4]메모리 개수, 사이즈 정보 확인\e[39m"
-mem=$(dmidecode -t memory | grep -i size: | grep -v 'No')
-echo $mem
-
-#[5]파티션 사이즈 확인
-echo -e "\e[32m[5]디스크 사이즈 확인\e[39m"
-fdisk -l |perl -ne 'print if /\/dev.+/'
-
-#[6]NIC 정보 확인
-echo -e "\e[32m[6]NIC 상태 정보 확인\e[39m"
-nic_list=$(netstat -nr | awk '{print $NF}' | grep -v ^table | grep -v ^Iface)
-for i in $nic_list
+#[4] result.txt에서 한 줄 씩 읽어서 curl을 이용하여 응답 속도 측정
+# url.txt에 "응답속도 URL" 형식으로 저장
+cat result.txt | while read -r line
 do
-echo $i
-echo `ethtool $i | egrep '(Speed|Duplex|Auto-negotiation|Link)'`
+echo `curl -o /dev/null -s -w "%{time_total}\n" $line` $line >> url.txt
 done
 
-#[7]IP 리스트 확인
-echo -e "\e[32m[6]IP 리스트 확인\e[39m"
-#ifconfig -a | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' # 정규식을 통해 IP리스트만 확인할 수 있음.
-ifconfig | egrep "(^\\w|inet )"
-GATEWAY=$(route | grep default | awk '{print $2}')
-echo "GW : $GATEWAY"
+#[5] 응답 속도 순으로 정렬하여 출력
+cat url.txt | awk '{print $1 " "  $2}' |  sort -n -k1
 
+#[6] 종료
+rm -f html *.tmp result.txt
+
+exit 0
