@@ -3,7 +3,7 @@
 # 운영하는 웹 서버의 상태를 검사하여 이상 발생 시 경고한다.     #
 #############################################################
 #[1] 타겟 URL
-url="http://222.231.21.149"
+url="http://IPADDRESS"
 
 date_str=$(date '+%Y/%m/%d %H:%M:%S')
 
@@ -25,4 +25,3 @@ elif [ "$httpstatus" -ge 400 ]; then # -ge 더 크거나 같음
   echo "[$date_str] HTTP 에러: HTTP status[$httpstatus]"
   #/root/alert.sh # 실행할 스크립트
 fi
-
