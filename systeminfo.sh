@@ -44,8 +44,10 @@ done
 
 #[7]IP 리스트 확인
 echo -e "\e[32m[6]IP 리스트 확인\e[39m"
-#ifconfig -a | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' # 정규식을 통해 IP리스트만 확인할 수 있음.
-ifconfig | egrep "(^\\w|inet )"
-GATEWAY=$(route | grep default | awk '{print $2}')
-echo "GW : $GATEWAY"
+# ifconfig -a | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' => 정규식을 통해 IP리스트만 확인할 수 있음.
+# '/^[a-z]'/ : 인터페이스명을 출력하기 위한 것. 소문자 알파벳으로 시작하는 줄의 첫 번째 컬럼
+# "[" $1 "]" : 인터페이스명에 대괄호[eth0]를 추가함.
+# arr[2] ":"로 분할한 컬럼 중에서 두 번째 컬럼
+ifconfig | awk '/^[a-z]/ {print "[" $1 "]"} /inet / {split($2,arr,":"); print arr[2]}' | grep -v '127.0.0.1'
 
+route -n | grep -e 'UG' | awk '{print "GW: " $2}'
