@@ -1,4 +1,5 @@
 #!/bin/sh
+# 사용법 : # ./ftp_upload_time.sh
 # FTP URL(IP), USER ID, PASSWORD 변수
 URL="10.10.10.10"
 USER="USER_ID"
