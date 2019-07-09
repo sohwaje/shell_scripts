@@ -19,6 +19,8 @@ echo "FileSize: $filesize (kb)"
 echo "FTP Server: $URL"
 
 # time 명령어를 통해 시간을 기록하면서 FTP로 데이터를 전송한다.
+# time -p를 통해 실제 시간을 얻는다. 
+# time 명령어 출력을 변수 $timefile로 리다이렉트 한다.
 (time -p ftp -i -n "$URL") << __EOT__ 2> $timefile
 user $USER $PASSWORD
 binary
