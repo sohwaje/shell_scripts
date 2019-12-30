@@ -14,8 +14,10 @@ while (true); do
   case "$choice" in
     y|Y])
       echo "$TARGETDIR의 데이터를 모두 삭제합니다."
-	find $TARGETDIR -maxdepth 1 ! -name temp -and ! -name webview -and ! -name .  -and ! -name delete.sh | xargs rm -rvf
+    cd $TARGETDIR
+	find . -maxdepth 1 ! -name temp -and ! -name webview -and ! -name . -and ! -name delete.sh | xargs rm -rvf
       sleep 1
+     break
     ;;
     n|N])
       echo "스크립트 종료"
