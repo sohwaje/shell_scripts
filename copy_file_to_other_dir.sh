@@ -1,8 +1,8 @@
 #!/bin/sh
 # 복사할 파일 목록이 담긴 리스트 파일 위치
-SOURCE_FILE_LIST="/home/sigongweb/apps/txt.txt"
+SOURCE_FILE_LIST="/home/SOURCE_FILE_LIST/apps/txt.txt"
 # 복사할 디렉토리 위치
-DEST_DIR="/home/sigongweb/apps/backup"
+DEST_DIR="/home/DEST_DIR/apps/backup"
 
 # 복사 시작 출력
 echo -e "\033[40;37;7m  Start Copy to ${DEST_DIR} \033[0m"
