@@ -1,4 +1,8 @@
 #!/bin/sh
+while :
+do
+  TIME=`/bin/date +%H:%M:%S`
+  printf "|%s " ${TIME}
 # Determine CPU load
 pcpu=$(ps -Ao pcpu | awk '{sum = sum + $1}END{print sum}')
 
@@ -11,13 +15,13 @@ tmem=$(cat /proc/meminfo | awk '/MemTotal/ {print $2}')
 # Helper function to convert KB to KB/MB/GB/TB
 pretty_print() {
   # We start with KB from /proc/meminfo and ps
-  [ $1 -lt 16384 ] && echo "${KB} K" && return
+  [ $1 -lt 1024 ] && echo "${KB} K" && return
   MB=$((($1+512)/1024))
-  [ $MB -lt 16384 ] && echo "${KB} M" && return
-  GB=$((($MG+512)/1024))
-  [ $GB -lt 16384 ] && echo "${KB} G" && return
+  [ $MB -lt 1024 ] && echo "${MB} M" && return
+  GB=$((($MB+512)/1024))
+  [ $GB -lt 1024 ] && echo "${GB} G" && return
   TB=$((($GB+512)/1024))
-  [ $TB -lt 16384 ] && echo "${KB} T" && return
+  [ $TB -lt 1024 ] && echo "${TB} T" && return
 }
 
 # Helper function to print bars for percentages
@@ -46,4 +50,6 @@ print_bars() {
 
 # Output: CPU $pcpu [|||   ] - MEM $mem / $tmem [|||   ]
 echo -e "CPU $pcpu [$(print_bars $pcpu 100)] - MEM $(pretty_print $mem) / $(pretty_print $tmem) [$(print_bars $mem $tmem)]"
-# echo -e "CPU $pcpu \[$(print_bars $pcpu 100)\]"
+  sleep 2
+  clear
+done
