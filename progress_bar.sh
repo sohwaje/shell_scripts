@@ -1,5 +1,7 @@
 #ref : https://c10106.tistory.com/5133
 #ref : https://github.com/fearside/ProgressBar/blob/master/progressbar.sh
+#ref : http://fitnr.com/showing-a-bash-spinner.html
+#ref : https://www.youtube.com/watch?v=93i8txD0H3Q
 #!/bin/sh
 
 function hide_cursor() {
