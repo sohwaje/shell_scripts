@@ -20,7 +20,7 @@ function progress () {
     echo -en "\r["
 
     inc=$1
-    if test $inc -gt 100; then
+    if test $inc -gt 100; then          # 더 큼 >
         inc=100;
     fi
 
@@ -30,7 +30,7 @@ function progress () {
         echo -n "="
         i=`expr $i + 1`
     done
- 
+
     while test $i -le 40; do
         echo -n " "
         i=`expr $i + 1`
