@@ -1,6 +1,5 @@
-```
-ref : https://c10106.tistory.com/5133
-```
+#ref : https://c10106.tistory.com/5133
+#ref : https://github.com/fearside/ProgressBar/blob/master/progressbar.sh
 #!/bin/sh
 
 function hide_cursor() {
