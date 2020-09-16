@@ -1,7 +1,7 @@
 #!/bin/sh
 spinner()
 {
-    local pid=$1
+    local pid=$!
     local delay=0.75
     local spinstr='|/-\'
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
