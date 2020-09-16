@@ -2,7 +2,7 @@
 spinner()
 {
     local pid=$!
-    local delay=0.75
+    local delay=0.2
     local spinstr='|/-\'
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
