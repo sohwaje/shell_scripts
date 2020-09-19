@@ -22,7 +22,7 @@ for i in ${url_list[@]}
 do
   # url $URL >/dev/null 2>&1
   if [[ $(url $i) == "ok" ]]; then
-    echo "$i is alive!!!!"    # if first url is alive, break loop
+    echo "$i is alive!!!!"    # loop control : if first url is alive, break loop
     break
     #continue
   else
