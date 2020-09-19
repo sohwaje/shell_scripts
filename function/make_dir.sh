@@ -6,5 +6,5 @@ function make_dirc
   local content=$2
   cd - >& /dev/null; cd $content; sudo mkdir ./$dirc
 }
-
-make_dirc b
+#usage
+make_dirc DIR_1
