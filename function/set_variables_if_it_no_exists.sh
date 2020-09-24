@@ -1,4 +1,5 @@
 #!/bin/bash
+# -z 변수가 비어 있는지 확인
 set_variables_if_it_no_exists()
 {
   if test -z "$basedir"                   # if null is True
