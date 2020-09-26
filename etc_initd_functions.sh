@@ -224,7 +224,8 @@ __pids_pidof() {
     pidof -c -m -o $$ -o $PPID -o %PPID -x "$1" || \
         pidof -c -m -o $$ -o $PPID -o %PPID -x "${1##*/}"
 }
-
+# __pids_pidof sshd
+# output : 114627 1926
 
 # A function to start a program.
 daemon() {
@@ -449,7 +450,7 @@ status() {
     local base pid lock_file= pid_file= binary=
 
     # Test syntax.
-    if [ "$#" = 0 ] ; then
+    if [ "$#" = 0 ] ; then  # Number of arguments
         echo $"Usage: status [-p pidfile] {program}"
         return 1
     fi
