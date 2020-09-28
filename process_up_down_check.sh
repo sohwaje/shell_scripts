@@ -28,7 +28,7 @@ function slack_message(){
 # Capture to Monitoring objects
 get_process()
 {
-  local value=$(ps aux | grep $1 | grep -v grep | awk '{print $2}')
+  local value=$(ps aux | grep $1 | grep -v grep | awk '{print $2}' | head -1)
   cat /proc/$value/cmdline | grep -ao $1 |head -1 2>/dev/null
 }
 
