@@ -1,17 +1,9 @@
 #!/bin/sh
-################################################################################
-# Instead of using the process name to determine what to monitor, use the string
-# included in the cmdline. This scripts uses both cmdline and pid.
-# When the monitoring object is down, alert it to slack channel.
-# You have to use a unigue string, because match the pid exactly.
-## usage : once every minute. use a cron scheduler
-## */1 * * * * sh /home/azureuser/process_up_down_check.sh
-################################################################################
-proc_names=("instance01" "mysqld")
-webhook="Y o u r - S l a c k - W e b H o o K - U R L"
-fals_true_check_dir="/var/tmp/"
+proc_names=("instance01" "mysqld") # monitoring object
 date_str=$(date '+%Y/%m/%d %H:%M:%S')
-# Alert to slack
+false_true_check_dir="/var/tmp/"
+webhook="https://Y o u r W e b H o o k URL"
+
 function slack_message(){
     # $1 : message
     # $2 : true=good, false=danger
@@ -20,57 +12,52 @@ function slack_message(){
     icon_emoji=":scream:"
     if $2 ; then
         COLOR="good"
-        icon_emoji=":smile:"
+	icon_emoji=":smile:"
     fi
     curl -s -d 'payload={"attachments":[{"color":"'"$COLOR"'","pretext":"<!channel> *lab*","text":"*HOST* : '"$HOSTNAME"' \n*MESSAGE* : '"$1"' '"$icon_emoji"'"}]}' $webhook > /dev/null 2>&1
 }
 
-# Capture to Monitoring objects
+# Capture the Monitoring object. To do precisely, It find pid as proc_names and proc_names as pid.
 get_process()
 {
   local value=$(ps aux | grep $1 | grep -v grep | awk '{print $2}'| head -1)
   cat /proc/$value/cmdline | grep -ao $1 |head -1 2>/dev/null
 }
 
-# 1번
-if [[ -f $fals_true_check_dir/${proc_names[0]} ]];then
-  return 0
-else
-  bash -c "cat << EOF > $fals_true_check_dir/${proc_names[0]}
-false
-EOF"
-fi
+# create $proc_name.txt if not exsist $porc_name.txt. And write false(Default : false) in $proc_name.txt
+create_proc_name()
+{
+  for proc_name in "${proc_names[@]}"
+  do
+    if [[ ! -f $false_true_check_dir/$proc_name.txt ]]
+    then
+      echo "false" > $false_true_check_dir/$proc_name.txt
+    fi
+  done
+}
 
-# 2번
-if [[ -f $fals_true_check_dir/${proc_names[1]} ]];then
-  return 0
-else
-  bash -c "cat << EOF > $fals_true_check_dir/${proc_names[1]}
-false
-EOF"
-fi
+# check running process. If not running, change "false" to "true" and alert to slack
+## $var.txt = $proc_name.txt
+main()
+{
+  create_proc_name
+  for var in "${proc_names[@]}"
+  do
+    if [[ "${proc_names[@]}" =~ $(get_process $var) ]]
+    then
+      if [[ $(get_process $var) = $var ]] && [[ $(cat "$false_true_check_dir/$var.txt") == "false" ]]
+      then
+        sed -i 's/^false$/true/' $false_true_check_dir/${var}.txt
+        slack_message "$date_str : $var UP"
+        echo "$date_str : $var UP"  # test
+      elif [[ $(get_process $var) != $var ]] && [[ $(cat "$false_true_check_dir/$var.txt") == "true" ]]
+      then
+        sed -i 's/^true$/false/' $false_true_check_dir/${var}.txt
+        slack_message "$date_str : $var DOWN" false
+        echo "$date_str : $var DOWN" # test
+      fi
+    fi
+  done
+}
 
-# check if exsist process
-if [[ $(get_process ${proc_names[0]}) = ${proc_names[0]} ]] && [[ $(cat "$fals_true_check_dir/${proc_names[0]}") == "false" ]]
-then
-  sed -i 's/^false$/true/' $fals_true_check_dir/${proc_names[0]}
-  # echo "$date_str : ${proc_names[0]} UP"
-  slack_message "$date_str : ${proc_names[0]} up"
-elif [[ $(get_process ${proc_names[0]}) != ${proc_names[0]} ]] && [[ $(cat "$fals_true_check_dir/${proc_names[0]}") == "true" ]]
-then
-  sed -i 's/^true$/false/' $fals_true_check_dir/${proc_names[0]}
-  # echo "$date_str : ${proc_names[0]} Down"
-  slack_message "$date_str : ${proc_names[0]} down" false # ":scream:"
-fi
-
-if [[ $(get_process ${proc_names[1]}) = ${proc_names[1]} ]] && [[ $(cat "$fals_true_check_dir/${proc_names[1]}") == "false" ]]
-then
-  sed -i 's/^false$/true/' $fals_true_check_dir/${proc_names[1]}
-  # echo "$date_str : ${proc_names[1]} UP"
-  slack_message "$date_str : ${proc_names[1]} up"
-elif [[ $(get_process ${proc_names[1]}) != ${proc_names[1]} ]] && [[ $(cat "$fals_true_check_dir/${proc_names[1]}") == "true" ]]
-then
-  sed -i 's/^true$/false/' $fals_true_check_dir/${proc_names[1]}
-  # echo "$date_str : ${proc_names[1]} Down"
-  slack_message "$date_str : ${proc_names[1]} down" false # ":scream:"
-fi
+main
