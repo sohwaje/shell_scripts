@@ -1,12 +1,20 @@
 #!/bin/bash
-var=$1
+## After Locate the PID by the program name kill the PID.
+program_name=$1
 
-pid_status()
+help()
 {
-  ps -ef | grep $var | grep -v grep | awk '{print $2}' | head -1
+  echo "Usage:$0 [program_name]"    # if Not equal, print
 }
 
-checkpid()
+# find program's pid name("grep -v $0" is itself script)
+pid_check()
+{
+  ps -ef | grep $program_name | grep -v grep | grep -v $0 | awk '{print $2}' | head -1
+}
+
+# exists pid in /proc
+check_pid()
 {
   for i in $* ; do
     [ -d "/proc/$i" ] && return 0
@@ -14,20 +22,28 @@ checkpid()
   return 1
 }
 
-main()
+# kill pid with echo messages
+kill_pid()
 {
-  local pid=$(pid_status)
-  if checkpid $pid; then
-    echo "Kill Process $PID"
-    kill -9 $PID
+  pid=$(pid_check)
+  if check_pid "$pid"; then
+    echo "Kill Process $pid"
+    kill -9 $pid
   else
-    echo "$pid is not...."
+    return 1
   fi
 }
 
-if [ "$#" -ne 1 ]; then # 인자 1개만: not equal
-  echo "Usage: killproc [name]"
-  exit 0
-fi
+# first execute function in this script
+main()
+{
+  if [[ "$#" -ne 1 ]]   # Not equal
+  then
+    help
+  else
+    kill_pid
+  fi
+}
 
-main
+# gO
+main $program_name
