@@ -1,5 +1,6 @@
 #!/bin/bash
-## After Locate the PID by the program name kill the PID.
+## After Locate the PID by the specified name kill the PID.
+## for example : application name
 program_name=$1
 
 help()
