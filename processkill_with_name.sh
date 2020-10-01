@@ -28,7 +28,7 @@ kill_pid()
   pid=$(pid_check)
   if check_pid "$pid"; then
     echo "Kill Process $pid"
-    kill -9 $pid
+    sudo kill -9 $pid
   else
     return 1
   fi
