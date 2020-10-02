@@ -14,8 +14,7 @@ _retVal()
 
 #### example 2
 retVal=$?
-test $retVal -eq 0 && echo "[OK]" || echo "[Failed]";
-exit $retVal
+test $retVal -eq 0 && echo "[OK]" || echo "[Failed]";exit $retVal
 
 #### example 3
 ec=$?
