@@ -1,4 +1,6 @@
 #!/bin/sh
+## usage
+## */1 * * * * sh /root/scripts/process_up_down_check.sh >> /home/azureuser/process_up_down_check.log 
 proc_names=("instance01" "mysqld") # monitoring object
 date_str=$(date '+%Y/%m/%d %H:%M:%S')
 false_true_check_dir="/var/tmp/"
