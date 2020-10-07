@@ -1,45 +1,82 @@
 #!/bin/bash
-#Created by SIGONGMEDIA Lee.Yu-Sung
+# Created by SIGONGMEDIA Lee.Yu-Sung
 
-# 0. COMMON VALUE
-BACKUPDIR="/data/mysql_backup"
+# 0. COMMON Variables
 ID="root"
 DBPASS='root'
 MYSQLBACKUP="/usr/local/mysql/bin/mysqlbackup"
+# Backup directory location
 INCREMENTALDIR="/data/mysql_backup/incremental"
+FULLBACKUPDIR="/data/mysql_backup/fullbackup"
 
 # 0  delete
-find $INCREMENTALDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d -exec rm -rfv {} \;
+# find $INCREMENTALDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d -exec rm -rfv {} \;
 
-# 1. FULL BACKUP
+# 검수
+_retVal()
+{
+  local retVal=$?
+  test $retVal -eq 0 && echo "[Successfully Backup completed]" || echo "[Backup Failed]";exit $retVal
+}
+
+## 가장 최근에 만들어진 풀백업 찾기 : show latest backup directory function
+latest()
+{
+  ls -ltr $FULLBACKUPDIR | grep -v grep | awk '{print $NF}' | grep -v ^$ |tail -n1
+}
+
+## 풀백업과 증분백업 디렉토리가 없으면 만든다 : Create incremental dir and fullbackup dir, Just if not exist
+exist_check_dir()
+{
+  if [[ ! -d $INCREMENTALDIR ]];then
+    mkdir -p $INCREMENTALDIR
+  fi
+  if [[ ! -d $FULLBACKUPDIR ]];then
+    mkdir -p $FULLBACKUPDIR
+  fi
+}
+
+# FULL BACKUP function
 full_backup()
 {
   $MYSQLBACKUP \
     --defaults-file=/etc/my.cnf \
     -u$ID -p$DBPASS \
-    --backup-dir=$BACKUPDIR \
+    --backup-dir=$FULLBACKUPDIR \
     --with-timestamp backup-and-apply-log
 }
 
-# 2. Restore
-#$MYSQLBACKUP --defaults-file=/etc/my.cnf -u$ID -p$DBPASS --backup-dir=$BACKUPDIR copy-back-and-apply-log
-
-# 3. INCREMENTAL Backup
+# INCREMENTAL Backup function
+## 가장 최근의 풀백업에 대한 증분 백업을 시작한다.
 incremental_backup()
 {
   $MYSQLBACKUP \
     --defaults-file=/etc/my.cnf \
     -u$ID -p$DBPASS \
-    --incremental --incremental-base=history:last_backup \
+    --incremental --incremental-base=dir:$FULLBACKUPDIR/$(latest) \
     --with-timestamp --incremental-backup-dir=$INCREMENTALDIR backup
 }
 
-if [[ ! -d $INCREMENTALDIR ]];then
-  mkdir -p $INCREMENTALDIR
-fi
+# Check whether a directory is empty or not
+## 풀백업 디렉토리가 비어 있으면 젠체백업 시작, 비어 있지 않으면 증분백업 시작
+main()
+{
+  exist_check_dir
+  if [[ "$(ls -A ${FULLBACKUPDIR})" ]]; then   # 풀 백업 디렉토리가 비어 있지 않으면 증분 백업 시작
+    echo "================> Start incremental backup"
+    sleep 3
+    incremental_backup
+  else
+    echo "================> Start full backup"
+    sleep 3
+    full_backup                                # 풀 백업 디렉토리가 비어 있으면 풀 백업 시작
+  fi
+}
 
-# 가장 최신의 fullbackup 디렉토리 찾기
-ls -ltr | grep -v grep | awk '{print $9}' | grep -v ^$ |tail -1
+main
+_retVal
+
+
 # 4. INCREMENTAL Restore
 # ex) mysqlbackup --incremental-backup-dir=/2017-02-22_10-12-41 --backup-dir=/2017-02-22_10-02-36 apply-incremental-backup
 # $MYSQLBACKUP --incremental-backup-dir=$BACKUPDIR/2020-10-07_14-56-14 --backup-dir=$BACKUPDIR/2020-10-07_13-23-56 apply-incremental-backup
