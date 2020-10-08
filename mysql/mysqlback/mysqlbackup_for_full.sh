@@ -47,6 +47,5 @@ main()
     slack_message "$DATE : Cannot Start Full backup" false
   fi
 }
- # 풀백업을 삭제하면 증분 백업 본도 삭제한다.
 main
 _retVal
