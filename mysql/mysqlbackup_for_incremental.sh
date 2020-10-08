@@ -18,7 +18,7 @@ FULLBACKUPDIR="/data/mysql_backup/fullbackup"
 _retVal()
 {
   local retVal=$?
-  test $retVal -eq 0 && echo "[$DATE : Successfully Backup completed]" || echo "[$DATE : Backup Failed]";exit $retVal
+  test $retVal -eq 0 && echo "[$DATE : Incremental Backup completed Successfully ]" || echo "[$DATE : Incremental Backup Failed]";exit $retVal
 }
 
 ## 가장 최근에 만들어진 풀백업 찾기 : show latest backup directory function
