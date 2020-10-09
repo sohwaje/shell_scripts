@@ -18,10 +18,10 @@ WEBHOOK_ADDRESS=""
 # mysqlback 파일이 존재하면서 실행 권한이 있는지 확인
 check_file_exec()
 {
-  if [[ ! -x ${MYSQLBACKUP} ]];then
+  if [[ -x ${MYSQLBACKUP} ]];then
     return 0
   else
-    return 1
+    "Unable to execute file."
     exit 1
   fi
 }
@@ -39,7 +39,7 @@ slack_message(){
     curl -s -d 'payload={"attachments":[{"color":"'"$COLOR"'","pretext":"<!channel> *smm*","text":"*HOST* : '"$HOSTNAME"' \n*MESSAGE* : '"$1"' '"$icon_emoji"'"}]}' $WEBHOOK_ADDRESS > /dev/null 2>&1
 }
 
-# 검수
+# 쉘 종료 코드 검수
 _retVal()
 {
   local retVal=$?

@@ -7,8 +7,6 @@
 # include mysqlback function
 . mysqlback_function.sh
 
-# Checking if a file has run permissions
-check_file_exec
 #///////////////////////////////////////////////////////////////////////////////
 ## old backup directory delete before starting new backup
 incremental_backup_delete()
@@ -50,5 +48,5 @@ main()
     slack_message "$DATE : Cannot Start Full backup" false
   fi
 }
-main
+check_file_exec && main # Checking if a file has run permissions, and run main function
 _retVal
