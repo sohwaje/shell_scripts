@@ -15,6 +15,16 @@ FULLBACKUPDIR="/data/mysql_backup/fullbackup"
 # slack webhook url
 WEBHOOK_ADDRESS=""
 
+# mysqlback 파일이 존재하면서 실행 권한이 있는지 확인
+check_file_exec()
+{
+  if [[ ! -x ${MYSQLBACKUP} ]];then
+    return 0
+  else
+    return 1
+    exit 1
+}
+
 # 슬랙 메세지 함수
 slack_message(){
     # $1 : message

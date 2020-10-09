@@ -6,6 +6,10 @@
 
 # include mysqlback function
 . mysqlback_function.sh
+
+# Checking if a file has run permissions
+check_file_exec
+
 #///////////////////////////////////////////////////////////////////////////////
 ## delete
 # find $INCREMENTALDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d -exec rm -rfv {} \;

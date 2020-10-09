@@ -6,6 +6,9 @@
 
 # include mysqlback function
 . mysqlback_function.sh
+
+# Checking if a file has run permissions
+check_file_exec
 #///////////////////////////////////////////////////////////////////////////////
 ## old backup directory delete before starting new backup
 incremental_backup_delete()
