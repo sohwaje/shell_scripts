@@ -23,6 +23,7 @@ check_file_exec()
   else
     return 1
     exit 1
+  fi
 }
 
 # 슬랙 메세지 함수
