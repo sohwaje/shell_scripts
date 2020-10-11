@@ -25,7 +25,7 @@ full_backup_delete()
     if [[ ! -z $targets ]];then
       for target in ${targets[@]}
       do
-        rm -rf $FULLBACKUPDIR/$target && incremental_backup_delete          # 풀백업 삭제되면, 증분 백업 전부 삭제
+        rm -rf $target && incremental_backup_delete          # 풀백업 삭제되면, 증분 백업 전부 삭제
       done
     fi
   fi
