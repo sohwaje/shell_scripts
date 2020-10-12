@@ -9,9 +9,12 @@ ID="root"
 DBPASS='root'
 MYSQLBACKUP="/usr/local/mysql/bin/mysqlbackup"
 DATE=$(date '+%Y-%m-%d %H:%M:%S')
+# Name of the backup directory moved
+ARCHIVING_DATE=$(date +%Y%m%d%H%M%S)
 # Backup directory location
 INCREMENTALDIR="/data/mysql_backup/incremental"
 FULLBACKUPDIR="/data/mysql_backup/fullbackup"
+ARCHIVINGDIR="/data/mysql_backup/archiving"
 # slack webhook url
 WEBHOOK_ADDRESS=""
 
@@ -53,7 +56,7 @@ latest()
   ls -ltr $FULLBACKUPDIR | grep -v grep | awk '{print $NF}' | grep -v ^$ |tail -n1
 }
 
-## 디렉토리가 없으면 만든다 : Create incremental dir and fullbackup dir, Just if not exist
+## 디렉토리가 없으면 만든다 : Create incremental dir, fullbackup dir and archiving dir, Only if not exist
 exist_check_dir()
 {
   if [[ ! -d $INCREMENTALDIR ]];then
@@ -61,6 +64,9 @@ exist_check_dir()
   fi
   if [[ ! -d $FULLBACKUPDIR ]];then
     mkdir -p $FULLBACKUPDIR
+  fi
+  if [[ ! -d $ARCHIVINGDIR ]];then
+    mkdir -p $ARCHIVINGDIR
   fi
 }
 
@@ -75,7 +81,6 @@ full_backup()
 }
 
 # INCREMENTAL Backup function
-## 가장 최근의 풀백업에 대한 증분 백업을 시작한다.
 incremental_backup()
 {
   $MYSQLBACKUP \
@@ -83,4 +88,56 @@ incremental_backup()
     -u$ID -p$DBPASS \
     --incremental --incremental-base=dir:$FULLBACKUPDIR/$(latest) \
     --with-timestamp --incremental-backup-dir=$INCREMENTALDIR backup
+}
+#///////////////////////////////////////////////////////////////////////////////
+## old backup directory delete before starting new backup
+incremental_backup_delete()
+{
+  if [[ "$(ls -A ${INCREMENTALDIR})" ]];then    # 증분 백업 디렉토리가 비어 있지 않을 때 실행
+    rm -rf $INCREMENTALDIR/*
+  else
+    echo "empty $INCREMENTALDIR"
+  fi
+}
+
+# full_backup_delete()
+# {
+#   if [[ "$(ls -A ${FULLBACKUPDIR})" ]];then     # 풀 백업 디렉토리가 비어 있지 않을 때 실행
+#     local targets=$(find $FULLBACKUPDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d) # 해당 기간에 포함되는 디렉토리 리스트를 배열로 저장
+#     if [[ ! -z $targets ]];then
+#       for target in ${targets[@]}
+#       do
+#         rm -rf $target && incremental_backup_delete          # 풀백업 삭제되면, 증분 백업 전부 삭제
+#       done
+#     fi
+#   fi
+# }
+
+# 아카이빙 디렉토리에서 지난 백업 데이터를 삭제한다.
+backup_delete()
+{
+  if [[ "$(ls -A ${ARCHIVINGDIR})" ]];then     # 풀 백업 디렉토리가 비어 있지 않을 때 실행
+    local targets=$(find $ARCHIVINGDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d) # 해당 기간에 포함되는 디렉토리 리스트를 배열로 저장
+    if [[ ! -z $targets ]];then
+      for target in ${targets[@]}
+      do
+        rm -rf $target # 지난 날짜의 백업 삭제
+      done
+    fi
+  fi
+}
+
+# 이전 풀백업, 증분백업 디렉토리의 이름을 변경하고 아카이빙 디렉토리에 보관한다.
+archiving_backup()
+{
+  backup_delete # 아카이빙 디렉토리 삭제 함수 호출
+  if [[ -d ${FULLBACKUPDIR} ]] && [[ -d ${INCREMENTALDIR} ]];then
+    echo "move backup directory"
+    mv ${FULLBACKUPDIR} $ARCHIVINGDIR/fullbackup-$ARCHIVING_DATE && \
+    mv ${INCREMENTALDIR} $ARCHIVINGDIR/incrementalbackup-$ARCHIVING_DATE && \
+    slack_message "$DATE : ARCHIVING success"
+  else
+    echo "ARCHIVING failed"
+    slack_message "$DATE : ARCHIVING failed" false
+  fi
 }
