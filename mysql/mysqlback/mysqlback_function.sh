@@ -12,9 +12,9 @@ DATE=$(date '+%Y-%m-%d %H:%M:%S')
 # Name of the backup directory moved
 ARCHIVING_DATE=$(date +%Y%m%d%H%M%S)
 # Backup directory location
-INCREMENTALDIR="/data/mysql_backup/incremental"
-FULLBACKUPDIR="/data/mysql_backup/fullbackup"
-ARCHIVINGDIR="/data/mysql_backup/archiving"
+INCREMENTALDIR="/mysql_backup/db/incremental"
+FULLBACKUPDIR="/mysql_backup/db/fullbackup"
+ARCHIVINGDIR="/mysql_backup/db/archiving"
 # slack webhook url
 WEBHOOK_ADDRESS=""
 
