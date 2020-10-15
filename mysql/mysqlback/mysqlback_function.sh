@@ -100,19 +100,6 @@ incremental_backup_delete()
   fi
 }
 
-# full_backup_delete()
-# {
-#   if [[ "$(ls -A ${FULLBACKUPDIR})" ]];then     # 풀 백업 디렉토리가 비어 있지 않을 때 실행
-#     local targets=$(find $FULLBACKUPDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d) # 해당 기간에 포함되는 디렉토리 리스트를 배열로 저장
-#     if [[ ! -z $targets ]];then
-#       for target in ${targets[@]}
-#       do
-#         rm -rf $target && incremental_backup_delete          # 풀백업 삭제되면, 증분 백업 전부 삭제
-#       done
-#     fi
-#   fi
-# }
-
 # 아카이빙 디렉토리에서 지난 백업 데이터를 삭제한다.
 backup_delete()
 {
