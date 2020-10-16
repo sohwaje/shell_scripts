@@ -6,7 +6,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 # include mysqlback function
 . mysqlback_function.sh
-
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
 ## Check whether a directory is empty or not
 # 풀백업 디렉토리가 비어 있으면 에러, 비어 있지 않으면 증분백업 시작
 main()

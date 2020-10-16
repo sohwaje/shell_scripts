@@ -6,7 +6,7 @@
 
 # include mysqlback function
 . mysqlback_function.sh
-
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
 ## Create incremental dir and fullbackup dir, Just if not exist
 # 풀백업 디렉토리가 없으면 만든다.
 main()
