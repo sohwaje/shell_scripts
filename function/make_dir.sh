@@ -1,6 +1,17 @@
 #!/bin/sh
-make_home_dir()
+# 매개 변수 체크 함수
+check_param()
 {
+  if [ "$#" -lt 1 ]; then     # 인자값이 1보다 작으면, 스크립트 사용법을 출력하고 종료.
+      echo "Usage: $0 dirname"
+  	exit 1
+  fi
+}
+
+# 디렉토리 생성 함수
+make_dir()
+{
+  check_param
 if [[ -d /home/${1} ]];then
   echo "/home/${1} directory does exist. Back up and recreate $1"
   sudo mv /home/${1} /home/${1}-${date_}
@@ -11,5 +22,4 @@ else
 fi
 }
 
-# usage
-make_dir Test
+make_dir
