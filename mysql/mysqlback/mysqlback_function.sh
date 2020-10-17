@@ -105,7 +105,7 @@ backup_delete()
 {
   if [[ "$(ls -A ${ARCHIVINGDIR})" ]];then     # 풀 백업 디렉토리가 비어 있지 않을 때 실행
     local targets=$(find $ARCHIVINGDIR -mindepth 1 -maxdepth 1 -mtime +0 -type d) # 해당 기간에 포함되는 디렉토리 리스트를 배열로 저장
-    if [[ ! -z $targets ]];then
+    if [[ ! -z $targets ]];then                # $targets 디렉토리가 null이 아니면 True
       for target in ${targets[@]}
       do
         rm -rf $target # 지난 날짜의 백업 삭제
