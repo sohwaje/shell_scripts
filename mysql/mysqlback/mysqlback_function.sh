@@ -122,9 +122,9 @@ archiving_backup()
     echo "move backup directory"
     mv ${FULLBACKUPDIR} $ARCHIVINGDIR/fullbackup-$ARCHIVING_DATE && \
     mv ${INCREMENTALDIR} $ARCHIVINGDIR/incrementalbackup-$ARCHIVING_DATE && \
-    slack_message "$DATE : ARCHIVING success"
+    slack_message "$(date '+%Y-%m-%d %H:%M:%S') : ARCHIVING success"
   else
     echo "ARCHIVING failed"
-    slack_message "$DATE : ARCHIVING failed" false
+    slack_message "$(date '+%Y-%m-%d %H:%M:%S') : ARCHIVING failed" false
   fi
 }
