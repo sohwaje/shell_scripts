@@ -21,7 +21,7 @@ main()
     full_backup
   else
     echo "================> Cannot Start Full backup."
-    slack_message "$DATE : Cannot Start Full backup" false
+    slack_message "$(date '+%Y-%m-%d %H:%M:%S') : Cannot Start Full backup" false
   fi
 }
 check_file_exec && main # Checking if a file has run permissions, and run main function

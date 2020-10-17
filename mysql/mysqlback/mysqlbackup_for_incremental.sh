@@ -6,7 +6,6 @@
 #///////////////////////////////////////////////////////////////////////////////
 # include mysqlback function
 . mysqlback_function.sh
-DATE=$(date '+%Y-%m-%d %H:%M:%S')
 ## Check whether a directory is empty or not
 # 풀백업 디렉토리가 비어 있으면 에러, 비어 있지 않으면 증분백업 시작
 main()
@@ -18,7 +17,7 @@ main()
     check_file_exec && incremental_backup
   else
     echo "================> Cannot Start incremental backup. not found full backup dir"
-    slack_message "$DATE : Cannot Start incremental backup" false    # 풀 백업 디렉토리가 비어 있으면 에러
+    slack_message "$(date '+%Y-%m-%d %H:%M:%S') : Cannot Start incremental backup" false    # 풀 백업 디렉토리가 비어 있으면 에러
   fi
 }
 

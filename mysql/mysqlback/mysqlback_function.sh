@@ -47,7 +47,7 @@ _retVal()
 {
   local retVal=$?
   test $retVal -eq 0 && \
-    slack_message "$DATE : Backup completed Successfully" || slack_message "backup failed " false;exit $retVal
+    slack_message "$(date '+%Y-%m-%d %H:%M:%S') : Backup completed Successfully" || slack_message "backup failed " false;exit $retVal
 }
 
 ## 가장 최근에 만들어진 풀백업 찾기 : show latest backup directory function
