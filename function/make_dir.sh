@@ -2,7 +2,7 @@
 # 매개 변수 체크 함수
 check_param()
 {
-  if [ "$#" -lt 1 ]; then     # 인자값이 1보다 작으면, 스크립트 사용법을 출력하고 종료.
+  if [ "$#" -lt 1 ]; then     # 인자값 개수($#) 1보다 작으면, 스크립트 사용법을 출력하고 종료.
       echo "Usage: $0 dirname"
   	exit 1
   fi
