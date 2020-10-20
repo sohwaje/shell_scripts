@@ -1,6 +1,6 @@
 #!/bin/sh
 ## usage
-## */1 * * * * sh /root/scripts/process_up_down_check.sh >> /home/azureuser/process_up_down_check.log 
+## */1 * * * * sh /root/scripts/process_up_down_check.sh >> /home/azureuser/process_up_down_check.log
 proc_names=("instance01" "mysqld") # monitoring object
 date_str=$(date '+%Y/%m/%d %H:%M:%S')
 false_true_check_dir="/var/tmp/"
@@ -45,7 +45,7 @@ main()
   create_proc_name
   for var in "${proc_names[@]}"
   do
-    if [[ "${proc_names[@]}" =~ $(get_process $var) ]]
+    if [[ "${proc_names[@]}" =~ $(get_process $var) ]]    # get_process 함수로 프로세스가 존재하는지 확인
     then
       if [[ $(get_process $var) = $var ]] && [[ $(cat "$false_true_check_dir/$var.txt") == "false" ]]
       then
