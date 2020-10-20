@@ -51,12 +51,12 @@ main()
       then
         sed -i 's/^false$/true/' $false_true_check_dir/${var}.txt
         slack_message "$date_str : $var UP"
-        echo "$date_str : $var UP"  # test
+        # echo "$date_str : $var UP"  # test
       elif [[ $(get_process $var) != $var ]] && [[ $(cat "$false_true_check_dir/$var.txt") == "true" ]]
       then
         sed -i 's/^true$/false/' $false_true_check_dir/${var}.txt
         slack_message "$date_str : $var DOWN" false
-        echo "$date_str : $var DOWN" # test
+        # echo "$date_str : $var DOWN" # test
       fi
     fi
   done
