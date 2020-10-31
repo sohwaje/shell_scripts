@@ -1,8 +1,8 @@
 #!/bin/sh
 #### example 1
-retVal=$?
 _retVal()
 {
+  local retVal=$?
   if [[ $retVal -eq 0 ]];then
     echo "[OK]"
     # do something
