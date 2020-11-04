@@ -4,9 +4,9 @@ check_param()
 {
   # 인자값 개수($#) 1보다 작으면, 스크립트 사용법을 출력하고 종료.
   if [[ "$#" -lt 1 ]]; then
-    echo "Usage: $0 dirname"
+    echo "Usage: $0 param:" >&2
     exit 1
   fi
 }
 
-check_param "$@" 
+check_param "$@"
