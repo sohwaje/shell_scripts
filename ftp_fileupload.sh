@@ -1,6 +1,5 @@
 #!/bin/bash
-# make remote folder by ftp and upload
-# ftp setting info : ./ftp_fileupload.sh -file=*
+# usage : ./ftp_fileupload.sh -file=*
 HOST="vodupload.cdn.cloudn.co.kr"
 PORT="21"
 ID="sigongmedia_erbank"
