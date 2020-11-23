@@ -1,4 +1,5 @@
 #!/bin/bash
+# Using ncftp as ftp
 # usage : ./ftp_fileupload.sh -file=*
 HOST="vodupload.cdn.cloudn.co.kr"
 PORT="21"
@@ -9,8 +10,6 @@ FILE_LIST="*"
 
 function print_helper() {
         # 이 스크립트를 사용하는데 필요한 도움말을 출력합니다.
-
-        echo 'ftp_fileupload.sh '
         echo '  -h              : 도움말'
         echo '  -addr=<address> : IP or URL'
         echo '  -port=<port>    : 접속할 포트 번호 (default:21)'
@@ -23,7 +22,7 @@ function print_helper() {
 }
 
 function set_paramter() {
-        if [ $1 == '-h' ]
+        if [ $1 == '-h' ]   # 인자값이 -h면 도움말을 출력한다.
         then
                 print_helper
         fi
@@ -32,7 +31,7 @@ function set_paramter() {
         # key=value로 파라미터가 구성된다.
         # print_helper 참고
 
-        arr=$(echo $1 | tr "=" "\n")
+        arr=$(echo $1 | tr "=" "\n") # 배열의 첫번째 인자값($1)이 "="면 줄바꿈으로 변경한다.
 
         declare -i count=0
         local key="none"
@@ -54,7 +53,7 @@ function set_paramter() {
         done
 
         # 추출된 key, value를 가지고
-        # 스크립트 환경을 설정합니다.
+        # $key와 문자열을 비교해서 같으면 True
         if [ $key == "-addr" ]
         then
                 IP=$value
@@ -111,11 +110,12 @@ END_SCRIPT
 }
 
 # ncftp가 설치되어 있는지 확인
-file=$(which ncftp)
-if [[ -f $file ]];then
-  echo "echo"
-else
+file=$(which ncftp 2>/dev/null)
+if [[ ! -f $file ]];then
+#   echo "echo"
+# else
   echo "Not install ncftp. Need to install ncftp package."
+  echo "COMMAND: yum install -y ncftp"
   exit 9
 fi
 
