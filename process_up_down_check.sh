@@ -1,6 +1,10 @@
 #!/bin/sh
+### Name    : process_up_down_check.sh
+### Author  : YuSung Lee
+### Version : 1.0
+### Date    : 2020-09-17
 ## usage
-## */1 * * * * sh /root/scripts/process_up_down_check.sh >> /home/azureuser/process_up_down_check.log
+## */1 * * * * sh /root/scripts/process_up_down_check.sh >> /var/log/process_up_down_check.log
 proc_names=("instance01" "mysqld") # monitoring object
 date_str=$(date '+%Y/%m/%d %H:%M:%S')
 false_true_check_dir="/var/tmp/"
