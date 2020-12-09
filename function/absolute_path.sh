@@ -1,5 +1,5 @@
 #!/bin/bash
-# # 스크립트 이름을 포함한 절대 경로, e.g. /home/user/bin/foo.sh
+# 스크립트 이름을 포함한 절대 경로, e.g. /home/user/bin/foo.sh
 Absolute_path_to_script()
 {
   SCRIPT=$(readlink -f "$0")
