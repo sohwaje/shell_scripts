@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 # jar 파일 복사
 PROC_NAME="$(ls ../ws_chk/gw_mail_appr.jar )"  # app location
 echo ${PROC_NAME}
