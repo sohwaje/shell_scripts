@@ -1,4 +1,5 @@
 #!/bin/bash
+# 2020-12-09
 planets=("Mercury 36" "Venus 67" "Earth 93" "Mars 142" "Jupiter 483")
 for planet in "${planets[@]}"
 do
