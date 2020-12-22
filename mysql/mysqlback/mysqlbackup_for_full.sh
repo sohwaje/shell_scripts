@@ -5,7 +5,7 @@
 ### Date    : 2020-10-08
 
 # include mysqlback function
-. mysqlback_function.sh
+. ~/scripts/mysqlback_function
 
 ## Create incremental dir and fullbackup dir, Just if not exist
 # 풀백업 디렉토리가 없으면 만든다.
