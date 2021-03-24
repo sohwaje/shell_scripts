@@ -1,12 +1,12 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 # jar 파일 복사
-PROC_NAME="$(ls ../ws_chk/gw_mail_appr.jar )"  # app location
+PROC_NAME="$(ls ../apps )"  # app location
 echo ${PROC_NAME}
-readonly DAEMON="/home/sigongweb/webapps/ws_chk/${PROC_NAME}"
+readonly DAEMON="/home/azureuser/apps/${PROC_NAME}"
 # [1]프로세스 아이디가 존재할 패스를 설정
-readonly PID_PATH="/home/sigongweb/webapps/bin/"
-readonly PROC_PID="${PID_PATH}${PROC_NAME}-edu.pid"
+readonly PID_PATH="/home/azureuser/bin/"
+readonly PROC_PID="${PID_PATH}${PROC_NAME}.pid"
 # 채널:build-deploy
 WEBHOOK_ADDRESS=""
 
@@ -31,9 +31,9 @@ start()
         echo "${PROC_NAME} is already running"
         #exit 0
     fi
-    nohup /home/sigongweb/jdk1.8.0_144/bin/java \
-    -jar -XX:MaxMetaspaceSize=512m -XX:MetaspaceSize=256m -Xms1024m -Xmx1024m \
-    "${DAEMON}" 183.98.92.243 3000 5 R 600000 > /dev/null 2>&1 &
+    nohup java \
+    -jar -XX:MaxMetaspaceSize=512m -XX:MetaspaceSize=256m -Xms256m -Xmx256m \
+    "${DAEMON}" > /dev/null 2>&1 &
 
     local PID=${!}
 
