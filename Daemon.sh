@@ -4,7 +4,7 @@
 # daemonName variable and then enter in the commands to run in the doCommands
 # function. Modify the variables just below to fit your preference.
 
-daemonName="DAEMON-NAME"
+daemonName="panopticon"
 
 pidDir="."
 pidFile="$pidDir/$daemonName.pid"
@@ -44,7 +44,7 @@ setupDaemon() {
     touch "$logFile"
   else
     # Check to see if we need to rotate the logs.
-    size=$((`ls -l "$logFile" | cut -d " " -f 8`/1024))
+    size=$((`ls -l "$logFile" | cut -d " " -f 4`/1024))
     if [[ $size -gt $logMaxSize ]]; then
       mv $logFile "$logFile.old"
       touch "$logFile"
@@ -112,7 +112,7 @@ checkDaemon() {
     if [ -f "$pidFile" ]; then
       if [[ `cat "$pidFile"` = "$oldPid" ]]; then
         # Daemon is running.
-        # echo 1
+        echo 1
         return 1
       else
         # Daemon isn't running.
