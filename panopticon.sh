@@ -69,7 +69,7 @@ startDaemon() {
 
 stopDaemon() {
   # Stop the daemon.
-  if [[ `checkDaemon` == "true" ]]; then
+  if [[ `checkDaemon` == "false" ]]; then
     echo " * \033[31;5;148mError\033[39m: $daemonName is not running."
     exit 1
   fi
@@ -102,8 +102,8 @@ restartDaemon() {
     exit 1
   fi
   # stop Daemon
-  stopDaemon; nohup sh $0 start > /dev/null 2>&1 &
-  # start Daemon self
+  # stopDaemon; nohup sh $0 start > /dev/null 2>&1 &
+  stopDaemon; echo "restart"; nohup sh $0 start
 
 }
 
