@@ -8,7 +8,6 @@ daemonName="panopticon"
 
 pidDir="."
 pidFile="$pidDir/$daemonName.pid"
-pidFile="$daemonName.pid"
 
 logDir="."
 # To use a dated log file.
@@ -30,7 +29,7 @@ doCommands() {
 # Below is the skeleton functionality of the daemon.
 ################################################################################
 
-myPid=`echo $$`
+pid_num=`echo $$`
 
 setupDaemon() {
   # Make sure that the directories work.
@@ -55,12 +54,12 @@ setupDaemon() {
 startDaemon() {
   # Start the daemon.
   setupDaemon # Make sure the directories are there.
-  if [[ `checkDaemon` == "false" ]]; then
+  if [[ `checkDaemon` ]]; then
     echo " * \033[31;5;148mError\033[39m: $daemonName is already running."
     exit 1
   fi
-  echo " * Starting $daemonName with PID: $myPid."
-  echo "$myPid" > "$pidFile"
+  echo " * Starting $daemonName with PID: $pid_num."
+  echo "$pid_num" > "$pidFile"
   log '*** '`date +"%Y-%m-%d"`": Starting up $daemonName."
 
   # Start the loop.
@@ -69,70 +68,53 @@ startDaemon() {
 
 stopDaemon() {
   # Stop the daemon.
-  if [[ `checkDaemon` == "false" ]]; then
-    echo " * \033[31;5;148mError\033[39m: $daemonName is not running."
-    exit 1
-  fi
-  echo " * Stopping $daemonName"
-  log '*** '`date +"%Y-%m-%d"`": $daemonName stopped."
-
-  if [[ ! -z `cat $pidFile` ]]; then
+  if [[ `checkDaemon` == false ]]; then
+    echo " * Stopping $daemonName"
+    log '*** '`date +"%Y-%m-%d"`": $daemonName stopped."
     kill -9 `cat "$pidFile"` &> /dev/null
     rm -f "$pidFile"
     sleep 3
     echo "done"
+  else
+    echo " * \033[31;5;148mError\033[39m: $daemonName is not running."
+    exit 1
   fi
+
+
 }
 
 statusDaemon() {
   # Query and return whether the daemon is running.
-  if [[ $(checkDaemon) == "false" ]]; then
-    echo " * $daemonName is running."
-  else
+  if [[ `checkDaemon` == true ]]; then
     echo " * $daemonName isn't running."
+  else
+    echo " * $daemonName is running."
   fi
   exit 0
 }
 
 restartDaemon() {
   # Restart the daemon.
-  if [[ $(checkDaemon) == "true" ]]; then
+  if [[ `checkDaemon` == false ]]; then
+    stopDaemon; echo "restart"; nohup sh $0 start > /dev/null 2>&1 &
+    exit 0
     # Can't restart it if it isn't running.
+  else
     echo "$daemonName isn't running."
     exit 1
   fi
-  # stop Daemon
-  # stopDaemon; nohup sh $0 start > /dev/null 2>&1 &
-  stopDaemon; echo "restart"; nohup sh $0 start
 
 }
 
 checkDaemon() {
-  # Check to see if the daemon is running.
-  # This is a different function than statusDaemon
-  # so that we can use it other functions.
-  if [ -z "$oldPid" ]; then
-    return 0
-  elif [[ `ps aux | grep "$oldPid" | grep -v grep` > /dev/null ]]; then
-    if [ -f "$pidFile" ]; then
-      if [[ `cat "$pidFile"` = "$oldPid" ]]; then
-        # Daemon is running.
-        echo "false"
-      else
-        # Daemon isn't running.
-        echo "true"
-      fi
-    fi
-  elif [[ `ps aux | grep "$daemonName" | grep -v grep | grep -v "$myPid" | grep -v "0:00.00"` > /dev/null ]]; then
-    # Daemon is running but without the correct PID. Restart it.
-    log '*** '`date +"%Y-%m-%d"`": $daemonName running with invalid PID; restarting."
-    restartDaemon
-    return 1
+  if [[ -f "$pidFile" ]] && [[ -r "$pidFile" ]]; then
+      # Daemon is running.
+    echo "false"
   else
-    # Daemon not running.
-    return 0
+        # Daemon isn't running.
+    echo "true"
   fi
-  return 1
+
 }
 
 loop() {
@@ -170,10 +152,10 @@ log() {
 # Parse the command.
 ################################################################################
 
-if [ -f "$pidFile" ]; then
-  oldPid=`cat "$pidFile"`
-fi
-checkDaemon
+# if [ -f "$pidFile" ]; then
+#   oldPid=`cat "$pidFile"`
+# fi
+# checkDaemon
 case "$1" in
   start)
     startDaemon
