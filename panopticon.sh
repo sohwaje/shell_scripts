@@ -54,8 +54,8 @@ setupDaemon() {
 startDaemon() {
   # Start the daemon.
   setupDaemon # Make sure the directories are there.
-  if [[ `checkDaemon` ]]; then
-    echo " * \033[31;5;148mError\033[39m: $daemonName is already running."
+  if [[ `checkDaemon` == false ]]; then
+    echo " * Errorm: $daemonName is already running."
     exit 1
   fi
   echo " * Starting $daemonName with PID: $pid_num."
@@ -76,7 +76,7 @@ stopDaemon() {
     sleep 3
     echo "done"
   else
-    echo " * \033[31;5;148mError\033[39m: $daemonName is not running."
+    echo " * Error: $daemonName is not running."
     exit 1
   fi
 
@@ -96,11 +96,12 @@ statusDaemon() {
 restartDaemon() {
   # Restart the daemon.
   if [[ `checkDaemon` == false ]]; then
-    stopDaemon; echo "restart"; nohup sh $0 start > /dev/null 2>&1 &
+    # stopDaemon; echo "restart"; nohup sh $0 start > /dev/null 2>&1 &
+    stopDaemon && echo "restart" && startDaemon; sleep 3
     exit 0
     # Can't restart it if it isn't running.
   else
-    echo "$daemonName isn't running."
+    echo "$daemonName isn't running. Daemon start first."
     exit 1
   fi
 
@@ -152,10 +153,6 @@ log() {
 # Parse the command.
 ################################################################################
 
-# if [ -f "$pidFile" ]; then
-#   oldPid=`cat "$pidFile"`
-# fi
-# checkDaemon
 case "$1" in
   start)
     startDaemon
@@ -170,7 +167,7 @@ case "$1" in
     restartDaemon
     ;;
   *)
-  echo "\033[31;5;148mError\033[39m: usage $0 { start | stop | restart | status }"
+  echo "Error: usage $0 { start | stop | restart | status }"
   exit 1
 esac
 
