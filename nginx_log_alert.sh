@@ -19,7 +19,7 @@ runInterval=60 # In seconds
 doCommands() {
   echo "doCommand"    # 데몬이 실행할 내용
   logfile="/var/log/nginx/oauth2client/https_stageoauth2client_error.log"
-  webhook="WEBHOOK_ADDRESS"
+  webhook="WEBHOOK_ADDRESS"  # 슬랙 webhook API 주소
 
   # * slack 알림 함수
   function slack_message(){
@@ -39,6 +39,7 @@ doCommands() {
   function send_alert(){
     slack_message "$(echo $line | sed "s/\"/'/g")" false
     cp ${logfile} ${logfile}_$(date '+%Y%m%d%H%M%S')
+    # rm -f *.log_*  # 백업한 로그 삭제
     cat /dev/null > ${logfile}
   }
   # * -F 실시간 감시
