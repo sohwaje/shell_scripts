@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: nohup sh daemon.sh start > /dev/null 2>&1 &
+# Usage: nohup sh panopticon.sh start > /dev/null 2>&1 &
 daemonName="panopticon"
 
 pidDir="."
@@ -18,6 +18,7 @@ runInterval=60 # In seconds
 
 doCommands() {
   echo "doCommand"    # 데몬이 실행할 내용
+  httplogdir="/var/log/nginx/oauth2client"
   logfile="/var/log/nginx/oauth2client/https_stageoauth2client_error.log"
   webhook="WEBHOOK_ADDRESS"  # 슬랙 webhook API 주소
 
@@ -39,7 +40,7 @@ doCommands() {
   function send_alert(){
     slack_message "$(echo $line | sed "s/\"/'/g")" false
     cp ${logfile} ${logfile}_$(date '+%Y%m%d%H%M%S')
-    # rm -f *.log_*  # 백업한 로그 삭제
+    # rm -f ${httplogdir}/*.log_*  # 백업한 로그 삭제
     cat /dev/null > ${logfile}
   }
   # * -F 실시간 감시
