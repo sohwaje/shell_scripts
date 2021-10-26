@@ -21,7 +21,7 @@ logMaxSize=1024   # 1mb
 runInterval=60 # In seconds
 
 doCommands() {
-  # This is where you put all the commands for the daemon.
+  # 데몬이 수행해야 할 모든 작업을 명시
   echo "Running commands."
 }
 
@@ -32,7 +32,7 @@ doCommands() {
 pid_num=`echo $$`
 
 setupDaemon() {
-  # Make sure that the directories work.
+  # 데몬에 필요한 디렉토리가 있는지 확인, 없으면 만든다.
   if [ ! -d "$pidDir" ]; then
     mkdir "$pidDir"
   fi
@@ -42,7 +42,7 @@ setupDaemon() {
   if [ ! -f "$logFile" ]; then
     touch "$logFile"
   else
-    # Check to see if we need to rotate the logs.
+    # 로그 로테이션 사이즈 설정
     size=$((`ls -l "$logFile" | cut -d " " -f 4`/1024))
     if [[ $size -gt $logMaxSize ]]; then
       mv $logFile "$logFile.old"
@@ -52,8 +52,8 @@ setupDaemon() {
 }
 
 startDaemon() {
-  # Start the daemon.
-  setupDaemon # Make sure the directories are there.
+  # 데몬 시작
+  setupDaemon # 데몬에 필요한 디렉토리가 있는지 확인
   if [[ `checkDaemon` == false ]]; then
     echo " * Errorm: $daemonName is already running."
     exit 1
@@ -108,6 +108,7 @@ restartDaemon() {
 }
 
 checkDaemon() {
+  # 데몬 체크: pidFile이 존재하고 읽을 수 있으면 false, 없으면 true
   if [[ -f "$pidFile" ]] && [[ -r "$pidFile" ]]; then
       # Daemon is running.
     echo "false"
@@ -120,21 +121,22 @@ checkDaemon() {
 
 loop() {
   # This is the loop.
-  now=`date +%s`
+  now=`date +%s`  # 현재 UNIX시간
 
   if [ -z $last ]; then
     last=`date +%s`
   fi
 
-  # Do everything you need the daemon to do.
+  # 데몬이 수행해야 할 작업
   doCommands
 
   # Check to see how long we actually need to sleep for. If we want this to run
   # once a minute and it's taken more than a minute, then we should just run it
   # anyway.
-  last=`date +%s`
+  last=`date +%s`  # 마지막 UNIX시간
 
   # Set the sleep interval
+  # "now-last+runInterval+1"이 runInterval 시간보다 작지 않으면, (now-last+runInterval) 동안 sleep 유지
   if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
     sleep $((now-last+runInterval))
   fi
