@@ -9,7 +9,11 @@
 ################################################################################
 ###[0] 변수(디바이스 타입, 마운트 포인트)
 DEVICE="sd" # sda, sdb, sdc ...
-MOUNTPOINT=('/data' '/data2')
+
+ARRAY2=( ## 마운트 포인트 배열
+    /data
+    /data2
+)
 ###[1] 디스크 찾기
 # OS의 모든 디스크 찾기(신규 디스크가 보임)
 DISK=$(lsblk -o NAME,HCTL,SIZE,MOUNTPOINT | grep -i ${DEVICE} | awk '{print $1}' | sed 's/[^a-z,A-Z,0-9]//g')
@@ -38,30 +42,30 @@ do
     sudo partprobe /dev/${i}$1
 done
 ###[3] 마운트 포인트 생성
-for i in ${MOUNTPOINT[@]};
+for i in ${ARRAY2[@]};
 do
     sudo mkdir $i
 done
 
-UUID_ARRAY=()
+###[4] 디스크 UUID를 배열에 추가
+ARRAY=() # 디스크 UUID 배열
 for i in ${TARGETDISK[@]};
 do
     UUID=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
-    UUID_ARRAY+=($UUID)
-    # for v in ${MOUNTPOINT[@]};
+    ARRAY+=($UUID)
+    # for v in ${ARRAY2[@]};
     # do
     #     echo "$UUID    $v  xfs defaults    0 0" | sudo tee -a /etc/fstab
     # done
 done
-    echo ${UUID_ARRAY[@]}
+    echo ${ARRAY[@]}
 
-
-for i in ${MOUNTPOINT[@]};
-do
-    for UUID in ${UUID_ARRAY[@]};
-    do
-    echo "$UUID    $i  xfs defaults    0 0" | sudo tee -a /etc/fstab
-    done
+###[5] 마운트 포인트 배열(ARRAY)과 디스크 UUID 배열(ARRAY2)에서 동시에 인자를 가져온다.
+# ref : https://stackoverflow.com/questions/17403498/iterate-over-two-arrays-simultaneously-in-bash
+for i in "${!ARRAY[@]}"; do
+    echo "${ARRAY[$i]}    ${ARRAY2[$i]}  xfs defaults    0 0" | sudo tee -a /etc/fstab
 done
+
+
 # ###[6] mount
-# sudo mount -a
+sudo mount -a
