@@ -10,7 +10,7 @@
 ###[0] 변수(디바이스 타입, 마운트 포인트)
 DEVICE="sd" # sda, sdb, sdc ...
 
-ARRAY2=( ## 마운트 포인트 배열
+ARRAY2=( ## 마운트 포인트 배열 ( array1 array2 )
     /data
 )
 ###[1] 디스크 찾기
