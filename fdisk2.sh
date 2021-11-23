@@ -12,7 +12,6 @@ DEVICE="sd" # sda, sdb, sdc ...
 
 ARRAY2=( ## 마운트 포인트 배열
     /data
-    /data2
 )
 ###[1] 디스크 찾기
 # OS의 모든 디스크 찾기(신규 디스크가 보임)
@@ -29,7 +28,6 @@ do
     DISK_ARRAY+=("$i") # DISK_ARRAY에 하나씩 추가 됨.
     fi
 done
-# echo ${DISK_ARRAY[@]} # 배열 나열하기
 
 ## 두 배열을 비교하여 중복되지 않는 배열의 요소를 출력(그것이 파티셔닝 대상이 될 디스크)하여 변수에 저장
 TARGETDISK=$(echo ${DISK_ARRAY[@]} ${MOUNT[@]} | tr ' ' '\n' | sort | uniq -u)
@@ -38,8 +36,8 @@ TARGETDISK=$(echo ${DISK_ARRAY[@]} ${MOUNT[@]} | tr ' ' '\n' | sort | uniq -u)
 for i in ${TARGETDISK[@]};
 do
     sudo parted /dev/${i} --script mklabel gpt mkpart xfspart xfs 0% 100%
-    sudo mkfs.xfs /dev/${i}$1
-    sudo partprobe /dev/${i}$1
+    sudo mkfs.xfs /dev/${i}1
+    sudo partprobe /dev/${i}1
 done
 ###[3] 마운트 포인트 생성
 for i in ${ARRAY2[@]};
@@ -52,13 +50,8 @@ ARRAY=() # 디스크 UUID 배열
 for i in ${TARGETDISK[@]};
 do
     UUID=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
-    ARRAY+=($UUID)
-    # for v in ${ARRAY2[@]};
-    # do
-    #     echo "$UUID    $v  xfs defaults    0 0" | sudo tee -a /etc/fstab
-    # done
+    ARRAY+=($UUID) #배열에 추가
 done
-    echo ${ARRAY[@]}
 
 ###[5] 마운트 포인트 배열(ARRAY)과 디스크 UUID 배열(ARRAY2)에서 동시에 인자를 가져온다.
 # ref : https://stackoverflow.com/questions/17403498/iterate-over-two-arrays-simultaneously-in-bash
