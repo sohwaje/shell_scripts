@@ -11,7 +11,7 @@
 ###[0] 변수(디바이스 타입, 마운트 포인트)
 DEVICE="sd" # sda, sdb, sdc ...
 
-ARRAY2=( ## 마운트 포인트 배열 ( array1 array2 )
+MOUNTPOINT_ARRAY=( ## 마운트 포인트 배열 ( array1 array2 )
     /data
 )
 ###[1] 디스크 찾기
@@ -33,31 +33,33 @@ done
 ## 두 배열을 비교하여 중복되지 않는 배열의 요소를 출력(그것이 파티셔닝 대상이 될 디스크)하여 변수에 저장
 TARGETDISK=$(echo ${DISK_ARRAY[@]} ${MOUNT[@]} | tr ' ' '\n' | sort | uniq -u)
 
-###[2] 디스크 포멧
+###[2] 타겟디스크 array에 담긴 요소를 가져와서 디스크 포멧
 for i in ${TARGETDISK[@]};
 do
     sudo parted /dev/${i} --script mklabel gpt mkpart xfspart xfs 0% 100%
     sudo mkfs.xfs /dev/${i}1
     sudo partprobe /dev/${i}1
 done
-###[3] 마운트 포인트 생성
-for i in ${ARRAY2[@]};
+###[3] 마운트 포인트 array에 담긴 요소를 가져와서 생성
+for i in ${MOUNTPOINT_ARRAY[@]};
 do
     sudo mkdir $i
 done
 
 ###[4] 디스크 UUID를 배열에 추가
-ARRAY=() # 디스크 UUID 배열
+UUID_ARRAY=() # 디스크 UUID 배열
 for i in ${TARGETDISK[@]};
 do
-    UUID=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
-    ARRAY+=($UUID) #배열에 추가
+    UUID_ARRAY=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
+    UUID_ARRAY+=($UUID_ARRAY) #배열에 추가
 done
 
-###[5] 마운트 포인트 배열(ARRAY)과 디스크 UUID 배열(ARRAY2)에서 동시에 인자를 가져온다.
+###[5] !UUID_ARRAY[@]는 array 전체 원소의 인덱스 값만 추출한다. 이것으로 각 Array의 인덱스 값에 매칭되는 string을 가져온다.
+# ex) UUID_ARRAY의 array에 요소가 두 개면 인덱스는 0, 1이 된다. 먼저 인덱스 0이 첫번째 array 변수 ${UUID_ARRAY[$i]}와 ${MOUNTPOINT_ARRAY[$i]}에 매칭되고 
+# 각 array의 0번 인덱스에 해당하는 string을 가져오게 되는 것이다.
 # ref : https://stackoverflow.com/questions/17403498/iterate-over-two-arrays-simultaneously-in-bash
-for i in "${!ARRAY[@]}"; do
-    echo "${ARRAY[$i]}    ${ARRAY2[$i]}  xfs defaults    0 0" | sudo tee -a /etc/fstab
+for i in "${!UUID_ARRAY[@]}"; do
+    echo "${UUID_ARRAY[$i]}    ${MOUNTPOINT_ARRAY[$i]}  xfs defaults    0 0" | sudo tee -a /etc/fstab
 done
 
 
