@@ -12,7 +12,8 @@
 DEVICE="sd" # sda, sdb, sdc ...
 
 MOUNTPOINT_ARRAY=( ## 마운트 포인트 배열 ( array1 array2 )
-    /data
+    /data3
+
 )
 ###[1] 디스크 찾기
 # OS의 모든 디스크 찾기(신규 디스크가 보임)
@@ -29,6 +30,7 @@ do
     DISK_ARRAY+=("$i") # DISK_ARRAY에 하나씩 추가 됨.
     fi
 done
+echo ${DISK_ARRAY[@]}
 
 ## 두 배열을 비교하여 중복되지 않는 배열의 요소를 출력(그것이 파티셔닝 대상이 될 디스크)하여 변수에 저장
 TARGETDISK=$(echo ${DISK_ARRAY[@]} ${MOUNT[@]} | tr ' ' '\n' | sort | uniq -u)
@@ -40,6 +42,7 @@ do
     sudo mkfs.xfs /dev/${i}1
     sudo partprobe /dev/${i}1
 done
+echo ${TARGETDISK[@]}
 ###[3] 마운트 포인트 array에 담긴 요소를 가져와서 생성
 for i in ${MOUNTPOINT_ARRAY[@]};
 do
@@ -50,9 +53,10 @@ done
 UUID_ARRAY=() # 디스크 UUID 배열
 for i in ${TARGETDISK[@]};
 do
-    UUID_ARRAY=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
-    UUID_ARRAY+=($UUID_ARRAY) #배열에 추가
+    UUID=$(sudo blkid | grep -i /dev/${i}1| awk '{print $2}')
+    UUID_ARRAY+=($UUID) #배열에 추가
 done
+echo ${UUID_ARRAY[@]}
 
 ###[5] !UUID_ARRAY[@]는 array 전체 원소의 인덱스 값만 추출한다. 이것으로 각 Array의 인덱스 값에 매칭되는 string을 가져온다.
 # ex) UUID_ARRAY의 array에 요소가 두 개면 인덱스는 0, 1이 된다. 먼저 인덱스 0이 첫번째 array 변수 ${UUID_ARRAY[$i]}와 ${MOUNTPOINT_ARRAY[$i]}에 매칭되고 
