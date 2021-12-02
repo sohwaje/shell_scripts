@@ -20,7 +20,7 @@ print_help() {
 }
 
 options="$(getopt -o d:u:f:h -l diffs:,unit:,format:,help -- "$@")"  # "$@"는 실제 명령 구문
-eval set -- $options  # "set --"는 뒤에 붙여진 문자열을 arg로 쪼개준다. ($1 = d, $)
+eval set -- $options  # "set --"는 뒤에 붙여진 문자열을 다 쪼개준다. "-d, 3, --unit, month, --format, +%m-%d, --"
                       # eval은 '$options' 문자열을 명령처럼 실행시킨다. 
 
 # ### 요소의 내용 보기
