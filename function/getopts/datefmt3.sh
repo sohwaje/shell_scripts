@@ -33,7 +33,7 @@ eval set -- $options  # "set --"는 뒤에 붙여진 문자열을 다 쪼개준�
 
 while true
 do
-    # echo "$1, $2  [$@]"
+    # echo "$1, $2  [$@]" # shift가 잘 되고 있는지 확인
     # 첫 번째 루프 : -d, 3  [-d 3 --unit month --format +%m-%d --]
     # 두 번째 루프 : --unit, month  [--unit month --format +%m-%d --]
     # 세 번째 루프 : --format, +%m-%d  [--format +%m-%d --]
@@ -57,5 +57,6 @@ do
     esac
 done
 
+# echo "date $F --date="$D $U
 RET=`date $F --date="$D $U"`
 echo "$RET"
