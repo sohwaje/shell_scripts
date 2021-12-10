@@ -4,7 +4,7 @@
 ### Version : 1.0
 ### Date    : 2021-12-09
 #######################################################################################################
-# - 삭제 가능한 파일을 찾아 자동으로 삭제하고 삭제 한 파일의 전체 크기, 개수를 Json 포맷 형식으로 Alert 서버에 전송하는 스크립트 #
+# - 삭제 가능한 파일을 찾아 자동으로 삭제하고 삭제 한 파일의 전체 크기, 개수를 Slack에 전송하는 스크립트 #
 #######################################################################################################
  
 # 백업 디렉토리 변수 설정
@@ -32,24 +32,36 @@ all_find_function()
  done
 }
 
-# Alert 서버로 전송할 JSON 포맷
-generate_post_data()
-{
-     cat <<EOF
-{
-    "Title": "확장자 : ${DELETE_TARGET[i]}",
-    "msg":{
-        "filelistname": "$filelist"
-        "TotalRemoveSize": "${SIZES[i]}",
-        "Files": "${FILES[i]} 외 ${NUMBERS[i] EA"
-        }
-    }
-EOF
-}
-
 # find로 찾은 파일의 사이즈의 합계를 구하는 함수
 TOTAL_COMMAND_ARG() {
     awk 'BEGIN{result=0} {result += $5} END {print result}'| awk '{value = $1/1024; print value "KB"}'
+}
+
+# Slack 채널로 알림을 전송하는 함수
+WEBHOOK_ADDRESS=""
+slack_message() {
+    curl -X POST -H 'Content-type: application/json' \
+--data '{
+    "attachments": [
+        {
+            "color": "'"$COLOR"'",
+            "pretext": "*Alert Bot*",
+            "author_name": "*Delete File Alert*",
+            "author_icon": "https://cdn.icon-icons.com/icons2/623/PNG/512/sign-emergency-code-sos_131_icon-icons.com_57207.png",
+            "fields": [
+                {
+                    "title": "Priority : *높음*",
+                    "short": false
+                }
+            ],
+            "image_url" : "",
+            "thumb_url" : "",
+            "footer" : "Slack API",
+            "footer_icon" : "https://platform.slack-edge.com/img/default_application_icon.png",
+            "text":"*HOST* : '"$HOSTNAME"' \n*Delete File list* : '"$filelist"' \n*Delete File Ext* : '"${DELETE_TARGET[i]}"' \n*Delete File Size* : '"${SIZES[i]}"' \n*Delete Files* : '"${FILES[i]}"'외 '"${NUMBERS[i]}"'개 '"$icon_emoji"'"
+        }
+    ]
+}' $WEBHOOK_ADDRESS > /dev/null 2>&1
 }
 
 # 삭제하기 전 파일이 저장되는 디렉토리, 없으면 만든다.
@@ -63,11 +75,10 @@ do
   echo "$filename" >> "${BACKUP_DIR_NAME}"/AR-$(date '+%y%m%d').txt
 done
 
-# 사이즈, 파일 개수, 삭제할 파일 목록의 첫 번째 파일들을 저장할 빈 배열 생성
+# 삭제 대상 확장자의 총 사이즈, 총 개수, 첫 번째 파일의 이름을 배열에 저장
 SIZES=()
 NUMBERS=()
 FILES=()
-
 for i in "${!DELETE_TARGET[@]}";
 do
     S=$(find / -type f -name "${DELETE_TARGET[$i]}" -not -path "/proc*" -exec ls -l {} \;| TOTAL_COMMAND_ARG) # 파일 사이즈 합계 "/proc 디렉토리는 제외한다"
@@ -90,7 +101,6 @@ clear
 for i in "${!FILES[@]}";
 do
     filelist=AR-$(date '+%y%m%d').txt
-    echo -e "\033[1;35m 삭제 대상 파일 - "${DELETE_TARGET[i]}", 사이즈 - "${SIZES[i]}" \033[0m"
-    echo curl -XPOST https://172.18.0.222:8080 -d "$(generate_post_data) $filelist ${DELETE_TARGET[i]} ${SIZES[i]} ${FILES[i]} ${NUMBERS[i]}"
+    # echo -e "\033[1;35m 삭제 대상 파일 - "${DELETE_TARGET[i]}", 사이즈 - "${SIZES[i]}" \033[0m"
+    slack_message "$filelist ${DELETE_TARGET[i]} ${SIZES[i]} ${FILES[i]} ${NUMBERS[i]}" true
 done
-
