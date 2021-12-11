@@ -92,8 +92,8 @@ done
 echo "삭제할 파일의 목록이 있는 텍스트 파일을 읽어서 각 파일을 차례로 /var/log/AutoRemover에 옮긴 뒤에 삭제한다."
 while read file; 
 do
-    echo \cp -afvr "${file}" "${BACKUP_DIR_NAME}" # 실제 복사하지 않고 복사 명령어를 echo로 실행(테스트 용)
-    echo rm -f "${file}" # 실제 삭제하지 않고 삭제 명령어를 echo로 출력(테스트 용)
+    \cp -afvr "${file}" "${BACKUP_DIR_NAME}" # 실제 복사하지 않고 복사 명령어를 echo로 실행(테스트 용)
+    rm -f "${file}" # 실제 삭제하지 않고 삭제 명령어를 echo로 출력(테스트 용)
 done < "${BACKUP_DIR_NAME}"/AR-$(date '+%y%m%d').txt
 clear
 
