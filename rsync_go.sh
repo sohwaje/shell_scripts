@@ -68,29 +68,29 @@ for i in $(ls -d ${SRC_DIR} 2> /dev/null); do
  OPTION="-lptgoDqd"
  put_multi_thread_rsync
  
- ## 1 depth : 1depth 디렉토리 내용을 가져옴
- for j in $(ls -d ${i}*/ 2> /dev/null); do
- echo "1 depth #"
- dir=${j}
- OPTION="-lptgoDqd"
- put_multi_thread_rsync
+    ## 1 depth : 1depth 디렉토리 내용을 가져옴
+    for j in $(ls -d ${i}*/ 2> /dev/null); do
+      echo "1 depth #"
+      dir=${j}
+      OPTION="-lptgoDqd"
+      put_multi_thread_rsync
  
- ## 2 depth : 2depth 디렉토리 내용을 가져옴
- for k in $(ls -d ${j}*/ 2> /dev/null); do
- echo "2 depth ##"
- dir=${k}
- OPTION="-lptgoDqd"
- put_multi_thread_rsync
+        ## 2 depth : 2depth 디렉토리 내용을 가져옴
+        for k in $(ls -d ${j}*/ 2> /dev/null); do
+          echo "2 depth ##"
+          dir=${k}
+          OPTION="-lptgoDqd"
+          put_multi_thread_rsync
   
- ## 3 depth : 3depth 이하는 -av로 모두 가져옴
- for l in $(ls -d ${k}*/ 2> /dev/null); do
- echo "3 depth ##"
- dir=${l}
- OPTION="-av"
- put_multi_thread_rsync
- done
- done
- done
+        ## 3 depth : 3depth 이하는 -av로 모두 가져옴
+            for l in $(ls -d ${k}*/ 2> /dev/null); do
+              echo "3 depth ##"
+              dir=${l}
+              OPTION="-av"
+              put_multi_thread_rsync
+            done
+        done
+    done
 done
 }
  
@@ -98,4 +98,4 @@ rsync_go
  
 EndTime=$(date +%s)
 echo "It takes $(($EndTime - $StartTime)) seconds to complete this task."
-#
+
