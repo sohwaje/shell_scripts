@@ -1,14 +1,14 @@
 #!/bin/bash
 # Using ncftp as ftp
 # usage : ./ftp_fileupload.sh -file=*
-HOST="vodupload.cdn.cloudn.co.kr"
+HOST="www.example.com"
 PORT="21"
-ID="sigongmedia_erbank"
-PASSWD="erbank1@"
-UPLOADDIR="/data/erbank"
+ID="exampleid"
+PASSWD="examplepassword"
+UPLOADDIR="/data"
 FILE_LIST="*"
 
-function print_helper() {
+print_helper() {
         # 이 스크립트를 사용하는데 필요한 도움말을 출력합니다.
         echo '  -h              : 도움말'
         echo '  -addr=<address> : IP or URL'
@@ -21,7 +21,7 @@ function print_helper() {
         exit
 }
 
-function set_paramter() {
+set_paramter() {
         if [ $1 == '-h' ]   # 인자값이 -h면 도움말을 출력한다.
         then
                 print_helper
@@ -93,7 +93,7 @@ function print_parameter_info() {
         done
 }
 
-function send_file() {
+send_file() {
         echo "################ FTP 업로드 시작 ################"
         echo $UPLOADDIR
         sleep 2
