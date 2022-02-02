@@ -13,9 +13,10 @@ mem=$(ps -Ao rss | awk '{sum = sum + $1}END{print sum}')
 tmem=$(cat /proc/meminfo | awk '/MemTotal/ {print $2}')
 
 # Helper function to convert KB to KB/MB/GB/TB
-pretty_print() {
+pretty_print() 
+{
   # We start with KB from /proc/meminfo and ps
-  [ $1 -lt 1024 ] && echo "${KB} K" && return
+  [ $1 -lt 1024 ] && echo "${1} K" && return
   MB=$((($1+512)/1024))
   [ $MB -lt 1024 ] && echo "${MB} M" && return
   GB=$((($MB+512)/1024))
@@ -30,8 +31,7 @@ print_bars() {
   local YELLOW='\033[33m'
   local RED='\033[31m'
   local RESET='\033[0m'
-  # local current=$(($1*10/$2))
-  local current=$(echo $1*10/$2 | bc)
+  local current=$((($1*10)/$2))
   local bars=0
   while [ $current -gt 0 ]; do    # > 0
     [ $bars -lt 3 ] && echo -n $GREEN    # < 3
