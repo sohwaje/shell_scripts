@@ -5,8 +5,11 @@ if [[ "$1" = "-l" ]]; then
    shift 2
 fi
 
-# 전체 파라미터의 개수가 1과 같거나 첫 번째 파라미터가 읽을 수 없다면 echo를 출력한다.
-if [[ $# -ne 1 -o ! -r "$1" ]]; then
-   echo "Usage: $(basename $0) [-l len] error_log" >&2
-   exit1
-fi
+# test
+func()
+{
+   echo "$1 $2 $3 $4"
+   shift 2
+   echo "$#"
+   echo "$1 $2 $3 $4"
+}
