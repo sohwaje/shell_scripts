@@ -1,147 +1,89 @@
 #!/bin/bash
-# Using ncftp as ftp
-# usage : ./ftp_fileupload.sh -file=*
-HOST="www.example.com"
-PORT="21"
-ID="exampleid"
-PASSWD="examplepassword"
-UPLOADDIR="/data"
-FILE_LIST="*"
 
-print_helper() {
-        # 이 스크립트를 사용하는데 필요한 도움말을 출력합니다.
-        echo '  -h              : 도움말'
-        echo '  -addr=<address> : IP or URL'
-        echo '  -port=<port>    : 접속할 포트 번호 (default:21)'
-        echo '  -id=<user id>   : id'
-        echo '  -pw=<password>  : password'
-        echo "  -uppath=<path>  : upload path (default : $UPLOADDIR)"
-        echo '  -file=<"file1,file2,file3 ...">' : file list
+# 기본 변수
+HOST="127.0.0.1"
+PORT=""
+ID="ftpuser"
+PW="passw0rd"
+
+# 도움말 함수
+print_helper() 
+{
+        echo '  -h: 도움말'
+        echo '  -r: -u 업로드디렉토리'
+        echo '  -l: -l 로컬디렉토리'
 
         exit
 }
 
-set_paramter() {
-        if [ $1 == '-h' ]   # 인자값이 -h면 도움말을 출력한다.
-        then
-                print_helper
-        fi
-
-        # 입력받은 파라미터러부터 key와 value를 구한다.
-        # key=value로 파라미터가 구성된다.
-        # print_helper 참고
-
-        arr=$(echo $1 | tr "=" "\n") # 배열의 첫번째 인자값($1)이 "="면 줄바꿈으로 변경한다.
-
-        declare -i count=0
-        local key="none"
-        local value="none"
-
-        # Key 값과 Value 값을 추출합니다.
-        for x in $arr
-        do
-                if [ $count -eq 0 ]
-                then
-                        key=$x
-
-                elif [ $count -eq 1 ]
-                then
-                        value=$x
-                fi
-
-                count=$count+1
-        done
-
-        # 추출된 key, value를 가지고
-        # $key와 문자열을 비교해서 같으면 True
-        if [ $key == "-addr" ]
-        then
-                IP=$value
-
-        elif [ $key == "-port" ]
-        then
-                PORT=$value
-
-        elif [ $key == "-id" ]
-        then
-                ID=$value
-
-        elif [ $key == "-pw" ]
-        then
-                PW=$value
-
-        elif [ $key == "-file" ]
-        then
-                FILE_LIST=$(echo $value | tr "," "\n")
-        else
-                print_helper
-                exit
-        fi
+# 스크립트 사용법 출력 함수
+print_try()
+{
+        echo "Usage: $0 -r REMOTEDIR -l LOCALDIR"
+        echo "example1: ./ftpupload.sh -r data -l /home/centos"
+        exit 1
 }
 
-function print_parameter_info() {
-        echo 'HOST =' $HOST
-        echo 'PORT =' $PORT
-        echo 'ID =' $ID
-        echo 'PW =' $PASSWD
-        echo 'FILE_LIST=' $FILE_LIST
+# Remote 디렉토리, Local 디렉토리 옵션
+while getopts r:l:f:h opt
+do
+        case $opt in
+            r)
+                REMOTEDIR=$OPTARG;;
+            l)
+                LOCALDIR=$OPTARG;;
+            h)
+                print_helper;;
+            *)
+                print_try;;
+        esac
+done
 
-        local x
-        for x in $FILE_LIST
-        do
-                echo "file_list='$x'"
-        done
-}
-
-send_file() {
+# FTP로 파일 전송 함수
+send_data() {
+        echo ""
         echo "################ FTP 업로드 시작 ################"
-        echo $UPLOADDIR
         sleep 2
+        ncftp -u $ID -p $PW -P $PORT $HOST 1> /dev/null <<END_SCRIPT
 
-        ncftp -u $ID -p $PASSWD $HOST  <<END_SCRIPT
-
-cd $UPLOADDIR
+cd $REMOTEDIR
 put -R $1
-
-quit
 END_SCRIPT
-
+        echo "send data = ${LOCALDIR}/$i"
         echo "################ FTP 업로드 완료 ################"
 }
 
+
 # ncftp가 설치되어 있는지 확인
-file=$(which ncftp 2>/dev/null)
-if [[ ! -f $file ]];then
-#   echo "echo"
-# else
-  echo "Not install ncftp. Need to install ncftp package."
-  echo "COMMAND: yum install -y ncftp"
-  exit 9
-fi
+check_ncftp()
+{
+        if [[ ! -f $(which ncftp 2>/dev/null) ]];then
+        echo "Not install ftp client. Need to install ftp package."
+        echo "COMMAND: yum install -y ftp"
+        exit 9
+        fi
+}
 
-# 인자값이 없으면 print_helper 함수 호출
-if [ $# -eq 0 ]
-then
-        print_helper
-fi
+# 파라미터 체크
+parameter_check()
+{
+        if [[ -z $REMOTEDIR || -z $LOCALDIR ]];then
+        print_try
+        exit 1
+        fi
 
-# 인자값이 0보다 많을 때 loop
-while [ $# -gt 0 ]
+        # 포트 변수가 비어 있으면 기본 포트(21) 사용.
+        if [[ -z $PORT ]];then 
+        echo "Set default port(21)"
+        PORT="21"
+        fi
+}
+
+parameter_check
+# FTP 파일 전송 메인 스크립트
+for i in $(ls ${LOCALDIR} 2> /dev/null)
 do
-        key=$1
-        value=$2
-
-        set_paramter ${key} ${value}
-        # shift를 이용하면 입력받은 파라미터가 1개씩 제거됩니다.
-        shift
-done
-
-print_parameter_info
-
-for x in $FILE_LIST
-do
-        echo "send file = $x"
-        send_file $x
+        send_data "${LOCALDIR}/$i"
 done
 
 exit 0
