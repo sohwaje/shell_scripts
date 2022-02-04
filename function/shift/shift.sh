@@ -11,5 +11,4 @@ func()
    echo "$1 $2 $3 $4"
    shift 2
    echo "$#"
-   echo "$1 $2 $3 $4"
 }
