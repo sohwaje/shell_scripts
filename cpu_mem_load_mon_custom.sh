@@ -54,19 +54,19 @@ print_bars() {
   local bars=0
   while [[ $current -gt 0 ]]; do          # 현재값이 0보다 크면 루프 시작 []
         if [[ $bars -lt 3 ]];then
-              echo -n $GREEN"|"             # $current [0 |1 |2] 
+              echo -n $GREEN"|"             
         fi            
         if [[ $bars -gt 2 ]] && [[ $bars -lt 6 ]]; then
-              echo -n $YELLOW"|"            # $current [|3 |4 |5]  
+              echo -n $YELLOW"|"             
         fi
         if [[ $bars -gt 5 ]] && [[ $bars -lt 10 ]];then
-              echo -n $RED"|"              # $current [|6 |7 |8]
+              echo -n $RED"|"              
         fi
-    # echo -n "|"   ## 개행하 않고 한 줄로 표시된다. echo -n $GREEN echo -n "|" ===> \033[32m(GREEN) |
+    # echo -n "|"  개행하지 않고 한 줄로 표시된다. echo -n $GREEN echo -n "|" ===> \033[32m(GREEN) |
     current=$(($current - 1))
     bars=$((bars + 1))
   done
-  echo $RESET     ## echo -n $GREEN echo -n "|" echo $RESET  ===> \033[32m(GREEN) | \033[0m\n
+  echo $RESET     # echo -n $GREEN echo -n "|" echo $RESET  ===> \033[32m(GREEN) | \033[0m\n
   while [ $bars -lt 10 ]; do
     echo -n ''
     bars=$((bars + 1))
