@@ -46,13 +46,13 @@ resource_print()
 
 # 퍼센테이지를 "|" 출력으로 보이게 하는 함수
 print_bars() {
-  local GREEN='\033[32m'
-  local YELLOW='\033[33m'
-  local RED='\033[31m'
+  local GREEN='\033[32;1m'
+  local YELLOW='\033[33;1m'
+  local RED='\033[31;1m'
   local RESET='\033[0m'               # 모든 색과 스타일을 검은 바탕의 흰색으로 초기화
   local current=$(echo $1*10/$2 | bc) # bash는 floating-point를 표현할 수 없기 때문에 서드파티 프로그램 bc를 설치해야 한다.
   local bars=0
-  while [[ $current -gt 0 ]]; do          # 현재값이 0보다 크면 루프 시작 []
+  while [[ $current -gt 0 ]]; do          # current=0 보다 크면 루프를 시작해서 current-1만큼 루프를 탐. current=10이면 1씩 감소하면서 10번 루프를 탐.
         if [[ $bars -lt 3 ]];then
               echo -n $GREEN"|"             
         fi            
@@ -62,15 +62,14 @@ print_bars() {
         if [[ $bars -gt 5 ]] && [[ $bars -lt 10 ]];then
               echo -n $RED"|"              
         fi
-    # echo -n "|"  개행하지 않고 한 줄로 표시된다. echo -n $GREEN echo -n "|" ===> \033[32m(GREEN) |
     current=$(($current - 1))
-    bars=$((bars + 1))
+    bars=$((bars + 1))                     # current는 1씩 감소하지만, bars는 1씩 늘어남. bar 개수가 늘면 "|"도 늘어남.
   done
   echo $RESET     # echo -n $GREEN echo -n "|" echo $RESET  ===> \033[32m(GREEN) | \033[0m\n
-  while [ $bars -lt 10 ]; do
-    echo -n ''
-    bars=$((bars + 1))
-  done
+  # while [ $bars -lt 10 ]; do 
+  #   echo -n ''
+  #   bars=$((bars + 1))
+  # done
 }
 
 # 결과물: CPU $pcpu [|||   ] - MEM $mem / $tmem [|||   ]
@@ -79,7 +78,7 @@ echo -e "CPU $pcpu [$(print_bars $pcpu 100)] - MEM $(resource_print $mem) / $(re
   clear
 done
 
-## [해설] print_bars()
+## [해설] current=10(100%)인 경우
 # +--------+--+--+--+--+--+--+--+--+--+--+--+
 # |current |10|9 |8 |7 |6 |5 |4 |3 |2 |1 |0 |
 # |--------+--+--+--+--+--+--+--+--+--+--+--+
