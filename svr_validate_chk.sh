@@ -1,15 +1,15 @@
 #!/bin/sh
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
+
 # 프로세스 이름으로 PID를 가져오고 그 PID로 프로세스 이름을 다시 반환하는 함수
-GREEN='\033[32;1m'
-RED='\033[31;1m'
-RESET='\033[0m'
- 
 get_process()
 {
     local value=$(ps aux | grep $1 | grep -v grep | awk '{print $2}'| head -1)
     cat /proc/$value/cmdline | grep -ao $1 |head -1 2>/dev/null
 }
- 
+
 # 확인해야 할 프로세스를 추가
 PROCESS=(
     "Pusher"
@@ -21,7 +21,7 @@ PROCESS=(
     "nginx"
     "php-fpm"
 )
- 
+
 # 데몬 확인
 DAEMON_CHK()
 {
@@ -29,14 +29,17 @@ DAEMON_CHK()
     echo "========"
     for i in ${PROCESS[@]};do
         if [[ -z $(get_process $i) ]];then
-            echo -e "$RED Not Active $RESET [$i]"
+            # echo -e "$RED Not Active $RESET [$i]"
+            printf "%20s %3s\n" "${RED} Not Active ${RESET}" "[$i]"
+
         else
-            echo -e "$GREEN Active $RESET [$i]"
+            # echo -e "$GREEN Active $RESET [$i]"
+            printf "%20s %3s\n" "${GREEN} Active ${RESET}" "[$i]"
         fi
     done
 echo ""
 }
- 
+
 # NIC 확인
 NIC_CHK()
 {
@@ -46,8 +49,8 @@ NIC_CHK()
     echo -e "$GREEN${NIC}$RESET"
 echo ""
 }
- 
- 
+
+
 # NIC 목록 및 NIC 스피드 확인
 NIC_SPEED_CHK()
 {
@@ -70,8 +73,8 @@ NIC_SPEED_CHK()
     done
 echo ""
 }
- 
- 
+
+
 # NFS 확인
 NFS_CHK()
 {
