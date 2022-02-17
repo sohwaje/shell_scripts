@@ -20,6 +20,8 @@ logMaxSize=1024   # 1mb
 
 runInterval=60 # In seconds
 
+# 스크립트 종료 시 또는 비정상 종료 시 pid 파일 삭제
+trap "$(which rm) -f $pidDir/$daemonName.pid" EXIT
 doCommands() {
   # 데몬이 수행해야 할 모든 작업을 명시
   echo "Running commands."
