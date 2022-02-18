@@ -1,11 +1,11 @@
-#!/bin/sh
-check=$(sas2ircu 0 display |grep State |grep -v Optimal |grep -v Rebuilding |wc -l)
-sas2ircu 0 display |grep 'State'|awk -F ':' '{print $2}' >> /tmp/status.txt
-sas2ircu 0 display |grep 'Slot #'|awk -F ':' '{print $2}' >> /tmp/hdd_no.txt
-paste /tmp/status.txt /tmp/hdd_no.txt >> /tmp/disk_info.txt
+#!/bin/bash
+check=$(sas2ircu 0 display |grep State |grep -v Optimal |grep -v Rebuilding |wc -l) # 비정상 하드디스크 디바이스 개수 확인
+status=$(sas2ircu 0 display |grep 'State'|awk -F ':' '{print $2}')
+hdd_no=$(sas2ircu 0 display |grep 'Slot #'|awk -F ':' '{print $2}')
+result=$(paste <(echo "$status") <(echo "$hdd_no"))
  
  
-cat /tmp/disk_info.txt| while read line; do
+echo "$result" | while read line; do
  if [[ "$check" == "0" ]];then
  echo "ALL OK"
  else

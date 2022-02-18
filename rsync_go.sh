@@ -43,10 +43,8 @@ fi
 ## 소스 디렉토리 마지막에 "/"로 끝나는지 확인해서 없으면 추가
 if [[ $(echo ${S:(-1)}) == "/" ]]; then
  SRC_DIR=${S}
- echo $SRC_DIR
-elif [[ $(echo ${S:(-1)}) != "/" ]]; then
+else
  SRC_DIR=${S}/
- echo $SRC_DIR
 fi
  
 ## 스크립트 실행 시작 시간
@@ -75,20 +73,12 @@ for i in $(ls -d ${SRC_DIR} 2> /dev/null); do
       OPTION="-lptgoDqd"
       put_multi_thread_rsync
  
-        ## 2 depth : 2depth 디렉토리 내용을 가져옴
+        ## 2 depth : 2depth 이하는 -av로 모두 가져옴
         for k in $(ls -d ${j}*/ 2> /dev/null); do
           echo "2 depth ##"
           dir=${k}
-          OPTION="-lptgoDqd"
+          OPTION="-av"
           put_multi_thread_rsync
-  
-        ## 3 depth : 3depth 이하는 -av로 모두 가져옴
-            for l in $(ls -d ${k}*/ 2> /dev/null); do
-              echo "3 depth ##"
-              dir=${l}
-              OPTION="-av"
-              put_multi_thread_rsync
-            done
         done
     done
 done
