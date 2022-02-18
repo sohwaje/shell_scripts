@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# nohup sh daemon.sh start > /dev/null 2>&1 &
 # This is a skeleton of a bash daemon. To use for yourself, just set the
 # daemonName variable and then enter in the commands to run in the doCommands
 # function. Modify the variables just below to fit your preference.
@@ -22,7 +22,8 @@ runInterval=60 # In seconds
 
 doCommands() {
   # 데몬이 수행해야 할 모든 작업을 명시
-  echo "Running commands."
+  # echo "Running commands."
+  echo "hello"
 }
 
 ################################################################################
@@ -61,6 +62,7 @@ startDaemon() {
   echo " * Starting $daemonName with PID: $pid_num."
   echo "$pid_num" > "$pidFile"
   log '*** '`date +"%Y-%m-%d"`": Starting up $daemonName."
+  nohup sh "$0" > /dev/null 2>&1 &
 
   # Start the loop.
   loop
