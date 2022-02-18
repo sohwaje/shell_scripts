@@ -75,3 +75,6 @@ else
 fi
 
 echo "You have to nginx config setting"
+
+# ${PREFIX}/bin/nginx/nginx start
+# ${PREFIX}/bin/nginx/nginx stop
