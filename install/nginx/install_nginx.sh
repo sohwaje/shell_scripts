@@ -20,6 +20,7 @@ if [[ -d ${PREFIX} ]];then
     mv ${PREFIX} ${PREFIX}-$(date +%Y%m%d%H%M)
 fi
 
+# 패키지 설치
 yum -y groupinstall 'Development Tools'
 yum -y install openssl-devel
 yum -y install pcre-devel libaio-devel zlib-devel
