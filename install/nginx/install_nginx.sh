@@ -37,7 +37,7 @@ yum -y install pcre-devel libaio-devel zlib-devel
     --error-log-path=/log/nginx/error.log \
     --http-log-path=/log/nginx/access.log \
     --http-client-body-temp-path=${PREFIX}/temp/client_body \
-    --http-proxy-temp-path-${PREFIX}/temp/proxy \
+    --http-proxy-temp-path=${PREFIX}/temp/proxy \
     --http-fastcgi-temp-path=${PREFIX}/temp/fastcgi \
     --http-uwsgi-temp-path=${PREFIX}/temp/uwsgi \
     --http-scgi-temp-path=${PREFIX}/temp/scgi
