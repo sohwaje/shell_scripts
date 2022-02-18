@@ -4,17 +4,21 @@
 # 설치 방법 : yum install -y bc #
 # 작성자: 이유성(yusung@sk.com) #
 ################################################################
+UPTOP=$(tput cup 0 0)
+ERAS2EOL=$(tput el)
+REV=$(tput rev)
+OFF=$(tput srgv0)
 
 # bc 설치 유무 체크
 if [[ -z $(which bc 2>/dev/null) ]]; then
   echo "Install bc package: yum install -y bc"
   exit 9
 fi
+clear
 
 while :
 do
-clear
-tput cup 0 0
+printf '%s' ${UPTOP}
 TIME=`/bin/date +%H:%M:%S`
 printf "Average |%s " ${TIME}
 # 전체 평균 CPU 사용률(mpstat -P ALL 1 1의 결과값의 9번째 열의 합계를 출력)
@@ -107,7 +111,7 @@ print_top5_mem()
  printf "+-------------------+------+--------------+\n"
  cat /tmp/$(hostname)_mem.$$| while read PROCESS MEMUSED PID
  do
- printf "|%18s |%5s | %5s %1s      |%1s\n" $PROCESS $PID $(resource_print $MEMUSED) [$(print_bars $MEMUSED $tmem)]
+ printf "|%18s |%5s | %5s %1s      |%1s%s\n" $PROCESS $PID $(resource_print $MEMUSED) [$(print_bars $MEMUSED $tmem)] "${ERAS2EOL}"
  done
  printf "+-------------------+-----+---------------+" 
  }
@@ -121,7 +125,7 @@ print_top5_cpu()
  printf "+-------------------+------+--------------+\n"
  cat /tmp/$(hostname)_cpu.$$| while read PROCESS PID CPUUSED
  do
- printf "|%18s |%5s | %5s        |%1s\n" $PROCESS $PID $CPUUSED [$(print_bars $CPUUSED 100)]
+ printf "|%18s |%5s | %5s        |%1s%s\n" $PROCESS $PID $CPUUSED [$(print_bars $CPUUSED 100)] "${ERAS2EOL}"
  done
  printf "+-------------------+-----+---------------+" 
  }
@@ -164,17 +168,17 @@ socket_mon()
  printf "| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d| %4d|\n",ESTABLISHED,LISTEN,TIME_WAIT,CLOSED,SYN_SENT,SYN_RECEIVED,CLOSE_WAIT,FIN_WAIT_1,FIN_WAIT_2,CLOSING,LAST_ACK;
  }'
  printf "+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+ \n"
-#  sleep 3
+ sleep 3
 }
 
 # 결과물: CPU $pcpu [||| ] - MEM $mem / $tmem [||| ] 
-echo -e " CPU $total_cpu % [$(print_bars $total_cpu 100)] - MEM $(resource_print $mem) / $(resource_print $tmem) [$(print_bars $mem $tmem)]"
+echo -e " CPU $total_cpu % [$(print_bars $total_cpu 100)] - MEM $(resource_print $mem) / $(resource_print $tmem) [$(print_bars $mem $tmem)] ${ERAS2EOL}"
 echo ''
 echo -e "$(print_top5_mem)"
 echo ''
 echo -e "$(print_top5_cpu)"
 echo ''
 socket_mon
- sleep 5
+ sleep 3
 done
 exit
