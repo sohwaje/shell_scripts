@@ -1,0 +1,79 @@
+#!/bin/bash
+SRC="/src"
+REPO="192.168.50.99"
+
+NGINXVER="nginx-1.20.2"
+PREFIX="/src/nginx"
+
+if [[ ! -d ${SRC} ]];then
+    mkdir -p ${SRC}
+fi
+
+wget http://nginx.org/download/nginx-1.20.2.tar.gz -P ${SRC}
+
+cd ${SRC}
+tar xvfz ${NGINXVER}.tar.gz
+
+cd ${NGINXVER}
+
+if [[ -d ${PREFIX} ]];then
+    mv ${PREFIX} ${PREFIX}-$(date +%Y%m%d%H%M)
+fi
+
+yum -y groupinstall 'Development Tools'
+yum -y install openssl-devel
+yum -y install pcre-devel libaio-devel zlib-devel
+
+./configure \
+    --prefix=${PREFIX} \
+    --pid-path=/var/run/nginx.pid \
+    --with-file-aio \
+    --with-threads \
+    --with-http_ssl_module \
+    --with-http_v2_module \
+    --with-http_gzip_static_module \
+    --with-http_stub_status_module \
+    --without-mail_pop3_module \
+    --without-mail_imap_module \
+    --without-mail_smtp_module \
+    --error-log-path=/log/nginx/error.log \
+    --http-log-path=/log/nginx/access.log \
+    --http-client-body-temp-path=${PREFIX}/temp/client_body \
+    --http-proxy-temp-path-${PREFIX}/temp/proxy \
+    --http-fastcgi-temp-path=${PREFIX}/temp/fastcgi \
+    --http-uwsgi-temp-path=${PREFIX}/temp/uwsgi \
+    --http-scgi-temp-path=${PREFIX}/temp/scgi
+
+    if [[ $? -eq 0 ]];then
+        make && make install
+        if [[ $? -eq 0 ]];then
+            echo "NGINX Install complete!"
+        fi
+    else
+        echo "Configure failed!"
+    fi
+
+# nginx conf file download
+if [[ -d ${PREFIX} ]];then
+    mkdir -p ${PREFIX}/temp
+    rm -f ${PREFIX}/conf/nginx.conf
+    rsync -av ${REPO}::APP/nginx/nginx.conf ${PREFIX}/conf
+    mkdir ${PREFIX}/conf/conf.d
+    mkdir ${PREFIX}/conf/ssl
+
+    mkdir -p /log/nginx
+
+    mkdir -p ${PREFIX}/bin
+    rsync -av ${REPO}::APP/nginx/nginx.init ${PREFIX}/bin/nginx
+    chmod 755 ${PREFIX}/bin/nginx
+
+    chown -R nobody:nobody ${PREFIX}/conf
+    chmod 600 -R ${PREFIX}/conf
+
+    rsync -av ${REPO}::APP/nginx/nginx.logrotate /etc/logrotate.d/nginx
+else
+    echo "nginx install failed"
+    exit -1
+fi
+
+echo "You have to nginx config setting"

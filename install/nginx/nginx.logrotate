@@ -1,0 +1,12 @@
+/log/nginx/*log {
+    create 640 nobody nobody
+    daily
+    dateext
+    rotate 5
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        [ ! -f /var/run/nginx.pid ] || /src/nginx/sbin/nginx -s reload
+    endscript
+}
