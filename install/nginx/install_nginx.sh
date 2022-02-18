@@ -1,7 +1,5 @@
 #!/bin/bash
 SRC="/src"
-REPO="192.168.50.99"
-
 NGINXVER="nginx-1.20.2"
 PREFIX="/src/nginx"
 
@@ -57,20 +55,20 @@ yum -y install pcre-devel libaio-devel zlib-devel
 if [[ -d ${PREFIX} ]];then
     mkdir -p ${PREFIX}/temp
     rm -f ${PREFIX}/conf/nginx.conf
-    rsync -av ${REPO}::APP/nginx/nginx.conf ${PREFIX}/conf
+    wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/nginx/nginx.conf -P ${PREFIX}/conf
     mkdir ${PREFIX}/conf/conf.d
     mkdir ${PREFIX}/conf/ssl
 
     mkdir -p /log/nginx
 
     mkdir -p ${PREFIX}/bin
-    rsync -av ${REPO}::APP/nginx/nginx.init ${PREFIX}/bin/nginx
+    wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/nginx/nginx.init.sh -O ${PREFIX}/bin/nginx/nginx
     chmod 755 ${PREFIX}/bin/nginx
 
     chown -R nobody:nobody ${PREFIX}/conf
     chmod 600 -R ${PREFIX}/conf
 
-    rsync -av ${REPO}::APP/nginx/nginx.logrotate /etc/logrotate.d/nginx
+    wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/nginx/nginx.logrotate -O /etc/logrotate.d/nginx
 else
     echo "nginx install failed"
     exit -1
