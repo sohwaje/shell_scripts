@@ -5,9 +5,9 @@
 # 작성자: 이유성(yusung@sk.com) #
 ################################################################
 UPTOP=$(tput cup 0 0)
-ERAS2EOL=$(tput el)
-REV=$(tput rev)
-OFF=$(tput srgv0)
+ERAS2EOL=$(tput el)    # clear to end of line
+REV=$(tput rev)        # 색상 반전 모드
+OFF=$(tput srgv0)      # 전체 
 
 # bc 설치 유무 체크
 if [[ -z $(which bc 2>/dev/null) ]]; then
