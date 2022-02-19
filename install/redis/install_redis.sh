@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC="/src"
-REDISVER="httpd-2.4.46"
+REDISVER="redis-6.2.6"
 PREFIX="/src/redis"
 
 # 소스 다운로드 디렉토리
@@ -11,7 +11,7 @@ fi
 wget https://download.redis.io/releases/redis-6.2.6.tar.gz -P ${SRC}
 
 cd ${SRC}
-tar jvxf ${REDISVER}.tar.gz
+tar xvfz ${REDISVER}.tar.gz
 
 cd ${REDISVER}/src
 
@@ -38,6 +38,8 @@ if [[ -d ${PREFIX} ]];then
         wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/redis.conf -P ${PREFIX}/conf
         wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/redisd -P ${PREFIX}/bin
         wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/sentineld -P ${PREFIX}/bin
+        chmod +x ${PREFIX}/bin/redisd
+        chmod +x ${PREFIX}/bin/sentineld
 else
         echo "redis install failed"
         exit -1
