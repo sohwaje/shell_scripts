@@ -15,7 +15,7 @@ tar xvfz ${NGINXVER}.tar.gz
 
 cd ${NGINXVER}
 
-# 설치 디렉토리
+# 설치 디렉토리가 있으면 백업
 if [[ -d ${PREFIX} ]];then
     mv ${PREFIX} ${PREFIX}-$(date +%Y%m%d%H%M)
 fi
@@ -45,14 +45,14 @@ yum -y install pcre-devel libaio-devel zlib-devel
     --http-uwsgi-temp-path=${PREFIX}/temp/uwsgi \
     --http-scgi-temp-path=${PREFIX}/temp/scgi
 
+if [[ $? -eq 0 ]];then
+    make && make install
     if [[ $? -eq 0 ]];then
-        make && make install
-        if [[ $? -eq 0 ]];then
-            echo "NGINX Install complete!"
-        fi
-    else
-        echo "Configure failed!"
+        echo "NGINX Install complete!"
     fi
+else
+    echo "Configure failed!"
+fi
 
 # nginx conf file download
 if [[ -d ${PREFIX} ]];then
