@@ -35,14 +35,14 @@ fi
 
 if [[ -d ${PREFIX} ]];then
         mkdir ${PREFIX}/conf
-        redis/conf ${PREFIX}/conf
-        redisd ${PREFIX}/bin/redisd
-        sentineld ${PREFIX}/bin/sentineld
+        wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/redis.conf -P ${PREFIX}/conf
+        wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/redisd -P ${PREFIX}/bin
+        wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/sentineld -P ${PREFIX}/bin
 else
         echo "redis install failed"
         exit -1
 fi
 
 mkdir -p /log/redis
-rsync /etc/logrotate.d/redis
+wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/redis/redis.logrotate -O /etc/logrotate.d/redis
 echo "${PREFIX}/bin/redisd start|stop"
