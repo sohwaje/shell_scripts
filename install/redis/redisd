@@ -1,0 +1,46 @@
+#! /bin/sh
+P=$(basename $0)
+REDISPORT=`echo $P | awk -F- '{print $2}'`
+
+if [[ "0$REDISPORT" == "0" ]];then
+    REDISPORT=6379
+    PIDFILE=/var/run/redis.pid
+    CONF="/src/redis/conf/redis.conf"
+else
+    PIDFILE=/var/run/redis_${REDISPORT}.pid
+    CONF="/src/redis/conf/redis_${REDISPORT}.conf"
+fi
+
+EXEC=/src/redis/bin/redis-server
+CLIEXEC=/src/redis/bin/redis-cli
+
+case "$1" in
+  start)
+	if [ -f $PIDFILE ]
+    then
+            echo "$PIDFILE exists, process is already running or crashed"
+    else
+            echo "Starting Redis Server..."
+            $EXEC $CONF
+	fi
+	;;
+  stop)
+	if [ ! -f $PIDFILE ]
+    then
+            echo "$PIDFILE does not exist, process is not running"
+    else
+            PID=$(cat $PIDFILE)
+            echo "Stopping ..."
+            $CLIEXEC -p $REDISPORT shutdown
+            while [ -x /proc/${PID} ]
+            do
+			    echo "Waiting for Redis to shutdown ..."
+                sleep 1
+            done
+            echo "Redis stopped"
+    fi
+	;;
+  *)
+	echo "Please use start or stop as first argument"
+	;;
+esac

@@ -1,0 +1,8 @@
+/log/redis/*.log {
+    daily
+    rotate 30
+    copytruncate
+    notifempty
+    missingok
+    dateext
+}

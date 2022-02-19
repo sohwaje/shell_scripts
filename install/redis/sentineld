@@ -1,0 +1,52 @@
+#!/bin/sh
+NAME=$(basename $0)
+SPORT=`echo $NAME | awk -F- '{print $2}'`
+
+if [[ "0$SPORT" == "0" ]];then
+    SPORT=26379
+    CONF="/src/redis/conf/sentinel.conf"
+    SENTINEL_PID="/var/run/sentinel.pid"
+    LOGFILE="/log/redis/sentinel.log"
+else
+    CONF="/src/redis/conf/sentinel_${SPORT}.conf"
+    SENTINEL_PID="/var/run/sentinel_${SPORT}.pid"
+    LOGFILE="/log/redis/sentinel_${SPORT}.log"
+fi
+
+EXEC=/src/redis/bin/redis-sentinel
+CLIEXEC=/src/redis/bin/redis-cli
+
+start() {
+    echo "Starting $NAME..."
+    $EXEC $CONF > $LOGFILE &
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && echo $! > "${SENTINEL_PID}";
+}
+
+stop() {
+    echo "Stopping $NAME..."
+    $CLIEXEC -p $SPORT shutdown
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && echo "Sentinel stopped" && rm -f  $SENTINEL_PID
+}
+
+restart() {
+    echo "Restarting $NAME"
+    stop
+    start
+}
+
+case "$1" in
+    start)
+    start
+        ;;
+    stop)
+    stop
+        ;;
+    restart)
+    restart
+        ;;
+    *)
+        echo "Please use start or stop or rerstart as first argument"
+        ;;
+esac
