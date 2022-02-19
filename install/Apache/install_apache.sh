@@ -52,8 +52,8 @@ fi
 if [[ -d ${PREFIX} ]];then
     mv ${PREFIX}/conf/httpd.conf ${PREFIX}/conf/httpd.conf.org
     mv ${PREFIX}/conf/extra/httpd-ssl.conf ${PREFIX}/conf/extra/httpd-ssl.conf.org
-    rsync -av ${REPO}::APP/apache/httpd-2.4.conf ${PREFIX}/conf/httpd.conf
-    rsync -av ${REPO}::APP/apache/httpd-ssl-2.4.conf ${PREFIX}/conf/extra/httpd-ssl.conf
+    wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/Apache/httpd.conf  ${PREFIX}/conf
+    wget https://raw.githubusercontent.com/sohwaje/shell_scripts/master/install/Apache/httpd-ssl.conf -P ${PREFIX}/conf/extra/httpd-ssl.conf
     mkdir -p /log/apache
     rm -rf ${PREFIX}/man
     rm -rf ${PREFIX}/manual
