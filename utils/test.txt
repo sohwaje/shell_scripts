@@ -1,0 +1,15 @@
+0 old_fs.txt 
+1 new_fs.txt 
+2 old_device.txt 
+new_device.txt 
+test.sh test_fun.sh 
+install_apache.sh 
+resource.sh 
+ftpupload.sh 
+install_nginx.sh 
+validating.sh 
+analyze_nginx_access.log.sh 
+rpmbuild nginx-1.20.1 
+original-ks.cfg 
+scc_agentd 
+access.log
