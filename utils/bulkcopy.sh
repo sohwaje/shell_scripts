@@ -17,16 +17,23 @@ result_time()
         EndTime=$(date +%s)
         echo "It takes $(($EndTime - $StartTime)) seconds to complete this task."
     else
-        exit 1
+        exit -1
     fi
+}
 
+# 실행될 명령어 (스크립트 수정 시 이 부분을 수정하면 됨)
+run_command()
+{
+    command="cp -avr"
+    echo "Running $command $srcdir/$file $destdir/"
+    $command "$srcdir/$file" $destdir/
 }
 
 ## 스크립트 실행 시작 시간
-result_time "begin"
-start_copy()
+
+start()
 {
-    command="cp -avr"
+    
     total=$(ls $srcdir | wc -l)
     files=$(ls -Sr $srcdir)
     for k in $(seq 1 $procs $total)
@@ -44,8 +51,8 @@ start_copy()
             fi
             
             file=$(echo "$files" | sed $(expr $i + $k)"q;d")  # $i+$k번째 라인 출력
-            echo "Running $command $srcdir/$file $destdir/"
-            $command "$srcdir/$file" $destdir/ &
+            run_command &
+
         done
         echo "####################### $k #######################"
         wait
@@ -72,4 +79,5 @@ if [[ -z $procs || -z $srcdir || -z $destdir ]];then
     printhelp
 fi
 
-start_copy
+result_time "begin"
+start
