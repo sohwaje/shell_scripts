@@ -1,30 +1,24 @@
 #!/bin/sh
-# nohup sh daemon.sh start > /dev/null 2>&1 &
-# This is a skeleton of a bash daemon. To use for yourself, just set the
-# daemonName variable and then enter in the commands to run in the doCommands
-# function. Modify the variables just below to fit your preference.
+# 실행방법 : nohup sh daemon.sh start > /dev/null 2>&1 &
 
 daemonName="panopticon"
 
-pidDir="."
+pidDir="/var/run"
 pidFile="$pidDir/$daemonName.pid"
 
-logDir="."
-# To use a dated log file.
-# logFile="$logDir/$daemonName-"`date +"%Y-%m-%d"`".log"
-# To use a regular log file.
+logDir="/var/log"
 logFile="$logDir/$daemonName.log"
 
 # Log maxsize in KB
-logMaxSize=1024   # 1mb
+logMaxSize=1024
 
 runInterval=60 # In seconds
 
 # 스크립트 종료 시 또는 비정상 종료 시 pid 파일 삭제
 trap "$(which rm) -f $pidDir/$daemonName.pid" EXIT
+
 doCommands() {
   # 데몬이 수행해야 할 모든 작업을 명시
-  # echo "Running commands."
   echo "hello"
 }
 
@@ -63,8 +57,7 @@ startDaemon() {
   fi
   echo " * Starting $daemonName with PID: $pid_num."
   echo "$pid_num" > "$pidFile"
-  log '*** '`date +"%Y-%m-%d"`": Starting up $daemonName."
-  nohup sh "$0" > /dev/null 2>&1 &
+  log '*** '`date +"%Y-%m-%d %H:%M:%S"`": Starting up $daemonName."
 
   # Start the loop.
   loop
@@ -74,7 +67,7 @@ stopDaemon() {
   # Stop the daemon.
   if [[ `checkDaemon` == false ]]; then
     echo " * Stopping $daemonName"
-    log '*** '`date +"%Y-%m-%d"`": $daemonName stopped."
+    log '*** '`date +"%Y-%m-%d %H:%M:%S"`": $daemonName stopped."
     kill -9 `cat "$pidFile"` &> /dev/null
     rm -f "$pidFile"
     sleep 3
@@ -112,46 +105,40 @@ restartDaemon() {
 }
 
 checkDaemon() {
-  # 데몬 체크: pidFile이 존재하고 읽을 수 있으면 false, 없으면 true
   if [[ -f "$pidFile" ]] && [[ -r "$pidFile" ]]; then
-      # Daemon is running.
-    echo "false"
+    echo "false"       # 데몬 실행
   else
-        # Daemon isn't running.
-    echo "true"
+    echo "true"        # 데몬 중지
   fi
 
 }
 
 loop() {
-  # This is the loop.
-  now=`date +%s`  # 현재 UNIX시간
+while true
+do
+    now=$(date +%s)  # 현재 UNIX시간
 
-  if [ -z $last ]; then
-    last=`date +%s`
-  fi
+    if [[ -z $last ]]; then
+      last=$(date +%s)
+    fi
 
   # 데몬이 수행해야 할 작업
-  doCommands
+    doCommands
 
   # Check to see how long we actually need to sleep for. If we want this to run
   # once a minute and it's taken more than a minute, then we should just run it
   # anyway.
-  last=`date +%s`  # 마지막 UNIX시간
-
-  # Set the sleep interval
+    last=$(date +%s)
   # "now-last+runInterval+1"이 runInterval 시간보다 작지 않으면, (now-last+runInterval) 동안 sleep 유지
-  if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
-    sleep $((now-last+runInterval))
-  fi
-
-  # Startover
-  loop
+    if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
+      sleep $((now-last+runInterval))
+    fi
+done
 }
 
 log() {
   # Generic log function.
-  echo "$1" >> "$logFile"
+  echo "$1 $2" >> "$logFile"
 }
 
 

@@ -82,10 +82,12 @@ listing_data()
         N=$(find / -type f -name "${DELETE_TARGET[$i]}" -not -path "/proc*" -exec ls -l {} \;|wc -l)              # 파일 개수
         NUMBERS+=("$N")
         F=$(basename $(find / -type f -name "${DELETE_TARGET[$i]}" -not -path "/proc*" | head -1) 2>/dev/null)    # 삭제 대상 파일 중 첫 번째 파일명 추출
+        echo "F: $F"
         FILES+=("$F")
     done
-# echo ${SIZES[@]}
-# echo ${NUMBERS[@]}
+# echo ${!SIZES[@]}
+# echo ${!NUMBERS[@]}
+# echo ${!FILES[@]}
 # echo ${FILES[@]}
 }
 
@@ -107,8 +109,9 @@ shoot_slack()
     for i in "${!FILES[@]}";  # FILES의 키($i)를 다른 배열의 키로 사용함.
     do
         filelist=AR-$(date '+%y%m%d').txt
-        slack_message "$filelist ${DELETE_TARGET[i]} ${SIZES[i]} ${FILES[i]} ${NUMBERS[i]}" true
-    done
+        # slack_message "$filelist ${DELETE_TARGET[i]} ${SIZES[i]} ${FILES[i]} ${NUMBERS[i]}" true
+        echo "$filelist ${DELETE_TARGET[i]} ${SIZES[i]} ${FILES[i]} ${NUMBERS[i]}"
+    done 
 }
 
 all_find_function # 삭제 대상 파일을 찾아서 목록화
